@@ -2,75 +2,130 @@
 <html lang="es">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>SmartFuh | Reportes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>SmartFuh | Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
-        :root { --brand: #4a2c2a; --accent: #e89c2c; }
-        body { margin: 0; background: var(--brand); color: white; font-family: 'Inter', sans-serif; padding-bottom: 110px; }
-        #videoBG { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; z-index: -1; }
-        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 24px; }
-        
-        /* Barra de navegación inferior */
-        .bottom-nav {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 92%; max-width: 450px; height: 75px;
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px);
-            border-radius: 30px; display: flex; justify-content: space-around; align-items: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5); z-index: 1000;
+        :root { --brand: #1a0f0e; --accent: #e89c2c; }
+        body { 
+            margin: 0; background: var(--brand); color: white; 
+            font-family: 'Inter', sans-serif; padding-bottom: 50px; 
+            overflow-x: hidden;
         }
-        .nav-item { color: #718096; display: flex; flex-direction: column; align-items: center; font-size: 9px; font-weight: 800; text-decoration: none; width: 60px; }
-        .nav-item.active { color: var(--brand); }
-        .nav-item i { font-size: 20px; margin-bottom: 3px; }
+        #videoBG { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; z-index: -1; filter: grayscale(1); }
         
-        .nav-center-wrapper { position: relative; top: -28px; }
-        .nav-center {
-            width: 62px; height: 62px; background: var(--brand);
-            transform: rotate(45deg); border-radius: 18px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3); border: 3px solid var(--accent);
+        .glass { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 30px; 
         }
-        .nav-center i { transform: rotate(-45deg); color: var(--accent); font-size: 24px; }
+        
+        /* Animaciones */
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Modal Ultra Premium */
+        #detail-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 10000; display: none; align-items: center; justify-content: center;
+            padding: 20px; backdrop-filter: blur(15px);
+        }
+
+        .report-card { transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .report-card:active { transform: scale(0.97); background: rgba(255,255,255,0.08); }
+
+        .status-badge {
+            padding: 4px 10px; border-radius: 8px; font-size: 8px; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        /* Loading Skeletons */
+        .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        @keyframes loading { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
 
     <video autoplay muted loop playsinline id="videoBG"><source src="12345.mp4" type="video/mp4"></video>
 
-    <header class="p-6 pt-12 flex items-center justify-between">
-        <div>
-            <h1 class="text-2xl font-black italic">REPORTES GLOABLES</h1>
-            <p class="text-[10px] uppercase opacity-60 font-bold tracking-widest">Resumen de actividad</p>
+    <header class="p-8 pt-16 flex items-center justify-between sticky top-0 z-50 bg-gradient-to-bottom from-var(--brand) to-transparent">
+        <div class="flex items-center gap-4">
+            <a href="inicio.html" class="w-12 h-12 glass flex items-center justify-center text-white active:scale-90 transition-transform">
+                <i class="fa-solid fa-arrow-left-long"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl font-black italic tracking-tighter leading-none uppercase">Reportes</h1>
+                <p id="live-status" class="text-[9px] font-black text-orange-400 tracking-[0.2em] mt-1 uppercase">Sincronizado</p>
+            </div>
         </div>
-        <div class="w-10 h-10 glass flex items-center justify-center">
-            <i class="fa-solid fa-chart-line text-orange-400"></i>
-        </div>
+        <button onclick="cargarReportes()" class="w-12 h-12 glass flex items-center justify-center text-orange-400">
+            <i class="fa-solid fa-rotate"></i>
+        </button>
     </header>
 
     <main class="px-6 space-y-6">
-        
         <div class="grid grid-cols-2 gap-4">
-            <div class="glass p-5">
-                <p class="text-[9px] font-bold opacity-50 uppercase">Total Encuestas</p>
-                <h3 id="total-encuestas" class="text-3xl font-black text-orange-400">0</h3>
+            <div class="glass p-6 border-b-4 border-orange-400">
+                <div class="flex justify-between items-start mb-2">
+                    <i class="fa-solid fa-layer-group text-orange-400/40 text-sm"></i>
+                    <span class="text-[8px] font-black opacity-40 uppercase">Total</span>
+                </div>
+                <h3 id="total-encuestas" class="text-4xl font-black italic tracking-tighter">0</h3>
+                <p class="text-[9px] opacity-40 font-bold uppercase mt-1">Formularios</p>
             </div>
-            <div class="glass p-5">
-                <p class="text-[9px] font-bold opacity-50 uppercase">Respuestas Recibidas</p>
-                <h3 id="total-respuestas" class="text-3xl font-black text-green-400">0</h3>
+            <div class="glass p-6 border-b-4 border-green-400">
+                <div class="flex justify-between items-start mb-2">
+                    <i class="fa-solid fa-clipboard-check text-green-400/40 text-sm"></i>
+                    <span class="text-[8px] font-black opacity-40 uppercase">Envíos</span>
+                </div>
+                <h3 id="total-respuestas" class="text-4xl font-black italic tracking-tighter">0</h3>
+                <p class="text-[9px] opacity-40 font-bold uppercase mt-1">Sincronizados</p>
             </div>
         </div>
 
-        <section>
-            <h3 class="text-xs font-bold opacity-50 uppercase mb-4 tracking-widest">Últimas Participaciones</h3>
-            <div id="lista-respuestas" class="space-y-3">
-                <div class="text-center py-10 opacity-30 italic text-sm">Cargando datos...</div>
+        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+            <div class="bg-orange-400 text-black px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">Recientes</div>
+            <div class="glass px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest opacity-40">Críticos</div>
+            <div class="glass px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest opacity-40">Mensuales</div>
+        </div>
+
+        <section class="space-y-4">
+            <div class="flex justify-between items-center px-2">
+                <h3 class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Registro de Actividad</h3>
+                <i class="fa-solid fa-arrow-down-short-wide text-[10px] opacity-40"></i>
+            </div>
+            
+            <div id="lista-respuestas" class="space-y-4">
+                <div class="skeleton h-24 rounded-[30px] w-full"></div>
+                <div class="skeleton h-24 rounded-[30px] w-full"></div>
+                <div class="skeleton h-24 rounded-[30px] w-full"></div>
             </div>
         </section>
-
     </main>
 
-    
+    <div id="detail-modal" onclick="event.target == this && closeModal()">
+        <div class="glass w-full max-w-md overflow-hidden flex flex-col max-h-[85vh] border-orange-400/20 shadow-2xl">
+            <div class="p-8 border-b border-white/5 flex justify-between items-end">
+                <div>
+                    <span class="text-[9px] font-black text-orange-400 uppercase tracking-widest">Resumen Técnico</span>
+                    <h2 class="font-black italic text-2xl uppercase tracking-tighter">Detalles</h2>
+                </div>
+                <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div id="modal-content" class="p-8 overflow-y-auto space-y-6 no-scrollbar">
+                </div>
+
+            <div class="p-8 pt-0">
+                <button onclick="closeModal()" class="w-full bg-orange-400 text-black py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] shadow-xl shadow-orange-400/20">Finalizar Revisión</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -89,51 +144,117 @@
         const db = firebase.firestore();
 
         async function cargarReportes() {
+            const container = document.getElementById('lista-respuestas');
+            const liveStatus = document.getElementById('live-status');
+            
+            liveStatus.innerText = "Actualizando...";
+            
             try {
-                // 1. Contar Encuestas
+                // Stats
                 const encuestasSnap = await db.collection('encuestas').get();
                 document.getElementById('total-encuestas').innerText = encuestasSnap.size;
 
-                // 2. Contar y Listar Respuestas
-                const respuestasSnap = await db.collection('respuestas').orderBy('fecha', 'desc').limit(10).get();
+                const respuestasSnap = await db.collection('respuestas').orderBy('fecha', 'desc').get();
                 document.getElementById('total-respuestas').innerText = respuestasSnap.size;
 
-                const container = document.getElementById('lista-respuestas');
                 container.innerHTML = '';
 
                 if (respuestasSnap.empty) {
-                    container.innerHTML = '<p class="text-center opacity-40 py-5">No hay respuestas aún.</p>';
+                    container.innerHTML = `
+                        <div class="py-20 text-center opacity-20">
+                            <i class="fa-solid fa-box-open text-5xl mb-4"></i>
+                            <p class="text-xs font-black uppercase">Sin datos en la nube</p>
+                        </div>`;
                     return;
                 }
 
-                respuestasSnap.forEach(doc => {
+                respuestasSnap.forEach((doc, index) => {
                     const r = doc.data();
-                    const fecha = r.fecha ? r.fecha.toDate().toLocaleDateString() : '---';
+                    const fecha = r.fecha ? r.fecha.toDate().toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '---';
+                    const hora = r.fecha ? r.fecha.toDate().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '';
                     
                     container.innerHTML += `
-                        <div class="glass p-4 flex items-center justify-between border-l-4 border-orange-400">
-                            <div>
-                                <h4 class="font-bold text-sm text-white">${r.usuarioNombre || 'Anónimo'}</h4>
-                                <p class="text-[10px] opacity-60">Respondió: ${r.tituloEncuesta || 'Encuesta'}</p>
+                        <div class="glass p-6 flex items-center justify-between report-card fade-in border-l-4 border-orange-400" style="animation-delay: ${index * 0.1}s" onclick="verDetalle('${doc.id}')">
+                            <div class="flex gap-4 items-center min-w-0">
+                                <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-file-invoice text-orange-400"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="font-black text-sm uppercase tracking-tight text-white truncate">${r.usuarioNombre || 'Agente Anónimo'}</h4>
+                                    <p class="text-[10px] opacity-40 font-bold uppercase truncate">${r.tituloEncuesta || 'Módulo General'}</p>
+                                </div>
                             </div>
-                            <div class="text-right">
-                                <p class="text-[9px] font-black opacity-40">${fecha}</p>
-                                <button onclick="verDetalle('${doc.id}')" class="text-[10px] text-orange-400 font-bold uppercase mt-1">Ver detalles</button>
+                            <div class="text-right shrink-0">
+                                <p class="text-[10px] font-black text-white">${fecha}</p>
+                                <p class="text-[8px] font-bold opacity-30 uppercase">${hora}</p>
                             </div>
                         </div>
                     `;
                 });
 
+                liveStatus.innerText = "Sincronizado";
+
             } catch (e) {
                 console.error(e);
-                document.getElementById('lista-respuestas').innerHTML = "Error al cargar reportes.";
+                liveStatus.innerText = "Error de Red";
             }
         }
 
-        function verDetalle(id) {
-            alert("ID de Respuesta: " + id + "\nPróximamente: Visualización detallada de respuestas.");
+        async function verDetalle(id) {
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="py-10 text-center">
+                    <i class="fa-solid fa-compass-drafting animate-spin text-3xl text-orange-400 mb-4"></i>
+                    <p class="text-[10px] font-black uppercase opacity-40">Extrayendo Metadata...</p>
+                </div>`;
+            document.getElementById('detail-modal').style.display = 'flex';
+
+            try {
+                const doc = await db.collection('respuestas').doc(id).get();
+                const data = doc.data();
+                
+                let html = `
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white/5 p-4 rounded-2xl">
+                            <p class="text-[8px] font-black opacity-30 uppercase mb-1">Operador</p>
+                            <p class="text-xs font-black text-orange-400 uppercase">${data.usuarioNombre || 'Anónimo'}</p>
+                        </div>
+                        <div class="bg-white/5 p-4 rounded-2xl">
+                            <p class="text-[8px] font-black opacity-30 uppercase mb-1">Duración</p>
+                            <p class="text-xs font-black uppercase">${data.duracion || 'N/A'}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <p class="text-[9px] font-black opacity-30 uppercase tracking-[0.2em] px-1">Respuestas del Sistema</p>
+                `;
+
+                if (data.respuestas) {
+                    Object.entries(data.respuestas).forEach(([pregunta, respuesta]) => {
+                        html += `
+                            <div class="bg-black/40 p-5 rounded-2xl border border-white/5">
+                                <p class="text-[9px] text-orange-400 font-black uppercase mb-2 leading-tight">${pregunta}</p>
+                                <p class="text-[13px] text-white/80 font-medium">${respuesta}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<p class="italic opacity-20 text-center py-10">No hay detalles estructurados.</p>`;
+                }
+
+                html += `</div>`;
+                content.innerHTML = html;
+
+            } catch (e) {
+                content.innerHTML = `<p class="text-center text-red-400 font-black uppercase text-[10px]">Error al cargar</p>`;
+            }
         }
 
+        function closeModal() {
+            document.getElementById('detail-modal').style.display = 'none';
+        }
+
+        // Inicializar
         cargarReportes();
     </script>
 </body>
