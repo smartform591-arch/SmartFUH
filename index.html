@@ -1,25 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <link rel="manifest" href="manifest.json">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SmartFuh">
-<link rel="apple-touch-icon" href="icon-192.png">
-
-<meta name="theme-color" content="#4a2c2a">
-
-<script>
-  // Registrar el Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('SW registrado', reg))
-        .catch(err => console.log('Error al registrar SW', err));
-    });
-  }
-</script>
+    
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>SmartFuh | Acceso</title>
@@ -130,6 +112,25 @@
         .hidden { display: none; }
     </style>
 </head>
+<link rel="manifest" href="manifest.json">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SmartFuh">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<meta name="theme-color" content="#4a2c2a">
+
+<script>
+  // Registrar el Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('SW registrado', reg))
+        .catch(err => console.log('Error al registrar SW', err));
+    });
+  }
+</script>
 <body>
 
     <video autoplay muted loop playsinline id="videoBG">
