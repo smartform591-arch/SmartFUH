@@ -3,138 +3,133 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-    <title>SmartFuh | Responder Elite</title>
+    <title>SmartFuh | Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;800&family=Playfair+Display:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
-        :root { --brand: #1a0f0e; --accent: #e89c2c; --border: rgba(255, 255, 255, 0.08); }
-        
-        /* Tipografías */
-        .font-modern { font-family: 'Inter', sans-serif; }
-        .font-tech { font-family: 'JetBrains Mono', monospace; }
-        .font-elegant { font-family: 'Playfair Display', serif; }
-
+        :root { --brand: #1a0f0e; --accent: #e89c2c; }
         body { 
             margin: 0; background: var(--brand); color: white; 
-            padding-bottom: 150px; scroll-behavior: smooth; transition: all 0.5s ease;
+            font-family: 'Inter', sans-serif; padding-bottom: 50px; 
+            overflow-x: hidden;
         }
-
-        #videoBG { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; z-index: -1; }
+        #videoBG { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; z-index: -1; filter: grayscale(1); }
         
         .glass { 
-            background: rgba(255, 255, 255, 0.04); 
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border); border-radius: 32px; 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 30px; 
+        }
+        
+        /* Animaciones */
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Modal Ultra Premium */
+        #detail-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 10000; display: none; align-items: center; justify-content: center;
+            padding: 20px; backdrop-filter: blur(15px);
         }
 
-        /* Botón Flotante Inicio */
-        .home-btn {
-            position: fixed; bottom: 120px; right: 25px; width: 55px; height: 55px;
-            background: var(--accent); color: var(--brand); border-radius: 18px;
-            display: flex; items-center; justify-content: center; font-size: 20px;
-            box-shadow: 0 10px 30px rgba(232, 156, 44, 0.3); z-index: 999;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .home-btn:active { transform: scale(0.9) rotate(-10deg); }
+        .report-card { transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .report-card:active { transform: scale(0.97); background: rgba(255,255,255,0.08); }
 
-        /* Preguntas */
-        .question-card { transition: 0.4s; }
-        .question-card:focus-within { 
-            background: rgba(255,255,255,0.08); 
-            border-color: var(--accent);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        .status-badge {
+            padding: 4px 10px; border-radius: 8px; font-size: 8px; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 1px;
         }
 
-        .input-text { 
-            width: 100%; background: rgba(0,0,0,0.3); 
-            border: 1.5px solid var(--border); 
-            border-radius: 20px; padding: 20px; color: white; 
-            outline: none; transition: 0.3s; font-weight: 600;
-        }
-        .input-text:focus { border-color: var(--accent); background: rgba(0,0,0,0.5); }
+        /* Loading Skeletons */
+        .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        @keyframes loading { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
-        .option-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1.5px solid var(--border);
-            padding: 20px; border-radius: 22px;
-            cursor: pointer; transition: 0.2s;
-            display: flex; align-items: center; gap: 15px;
-        }
-        .option-card.selected { background: var(--accent); color: var(--brand); border-color: var(--accent); font-weight: 900; }
-
-        .progress-bar-fill {
-            height: 100%; background: var(--accent);
-            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 0 20px var(--accent);
-        }
-
-        .btn-submit {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 450px; background: var(--accent); color: var(--brand);
-            font-weight: 900; padding: 22px; border-radius: 25px; 
-            text-transform: uppercase; letter-spacing: 2px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4); z-index: 100;
-        }
-        .btn-submit:disabled { opacity: 0.2; transform: translateX(-50%) scale(0.98); }
-
-        #success-screen {
-            position: fixed; inset: 0; background: var(--brand); z-index: 2000;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="font-modern">
+<body>
 
     <video autoplay muted loop playsinline id="videoBG"><source src="12345.mp4" type="video/mp4"></video>
 
-    <a href="inicio.html" class="home-btn" onclick="return confirm('¿Volver al inicio? Se perderá el progreso actual.')">
-        <i class="fa-solid fa-house"></i>
-    </a>
-
-    <div id="toast-container" class="fixed top-10 left-1/2 -translate-x-1/2 z-[3000] w-[90%] pointer-events-none"></div>
-
-    <div id="success-screen" class="p-10 text-center">
-        <div class="w-24 h-24 bg-orange-400 rounded-3xl flex items-center justify-center mb-8 rotate-12 shadow-2xl mx-auto">
-            <i class="fa-solid fa-paper-plane text-4xl text-black"></i>
-        </div>
-        <h2 class="text-4xl font-black italic tracking-tighter mb-4">DATOS ENVIADOS</h2>
-        <p class="opacity-40 text-[10px] uppercase font-bold tracking-[0.3em] mb-12">La terminal ha recibido tu reporte.</p>
-        <button onclick="window.location.href='inicio.html'" class="w-full max-w-xs py-5 glass font-black uppercase text-[11px] tracking-widest">Finalizar Sesión</button>
-    </div>
-
-    <header class="p-8 pt-16">
-        <div class="flex justify-between items-start mb-8">
-            <div class="space-y-1">
-                <h1 id="survey-title" class="text-3xl font-black italic tracking-tighter uppercase leading-none">Cargando...</h1>
-                <p id="timer" class="text-[9px] font-black text-orange-400 uppercase tracking-widest opacity-60">Iniciando cronómetro...</p>
-            </div>
-            <div class="text-right">
-                <span id="progress-text" class="text-2xl font-black italic text-orange-400">0%</span>
+    <header class="p-8 pt-16 flex items-center justify-between sticky top-0 z-50 bg-gradient-to-bottom from-var(--brand) to-transparent">
+        <div class="flex items-center gap-4">
+            <a href="inicio.html" class="w-12 h-12 glass flex items-center justify-center text-white active:scale-90 transition-transform">
+                <i class="fa-solid fa-arrow-left-long"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl font-black italic tracking-tighter leading-none uppercase">Reportes</h1>
+                <p id="live-status" class="text-[9px] font-black text-orange-400 tracking-[0.2em] mt-1 uppercase">Sincronizado</p>
             </div>
         </div>
-        
-        <div class="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-            <div id="progress-bar" class="progress-bar-fill" style="width: 0%"></div>
-        </div>
+        <button onclick="cargarReportes()" class="w-12 h-12 glass flex items-center justify-center text-orange-400">
+            <i class="fa-solid fa-rotate"></i>
+        </button>
     </header>
 
-    <main id="questions-container" class="px-6 space-y-8">
-        <div class="glass p-10 space-y-6 animate-pulse">
-            <div class="w-20 h-4 bg-white/10 rounded-full"></div>
-            <div class="w-full h-10 bg-white/10 rounded-xl"></div>
-            <div class="w-full h-20 bg-white/10 rounded-3xl"></div>
+    <main class="px-6 space-y-6">
+        <div class="grid grid-cols-2 gap-4">
+            <div class="glass p-6 border-b-4 border-orange-400">
+                <div class="flex justify-between items-start mb-2">
+                    <i class="fa-solid fa-layer-group text-orange-400/40 text-sm"></i>
+                    <span class="text-[8px] font-black opacity-40 uppercase">Total</span>
+                </div>
+                <h3 id="total-encuestas" class="text-4xl font-black italic tracking-tighter">0</h3>
+                <p class="text-[9px] opacity-40 font-bold uppercase mt-1">Formularios</p>
+            </div>
+            <div class="glass p-6 border-b-4 border-green-400">
+                <div class="flex justify-between items-start mb-2">
+                    <i class="fa-solid fa-clipboard-check text-green-400/40 text-sm"></i>
+                    <span class="text-[8px] font-black opacity-40 uppercase">Envíos</span>
+                </div>
+                <h3 id="total-respuestas" class="text-4xl font-black italic tracking-tighter">0</h3>
+                <p class="text-[9px] opacity-40 font-bold uppercase mt-1">Sincronizados</p>
+            </div>
         </div>
+
+        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+            <div class="bg-orange-400 text-black px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">Recientes</div>
+            <div class="glass px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest opacity-40">Críticos</div>
+            <div class="glass px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest opacity-40">Mensuales</div>
+        </div>
+
+        <section class="space-y-4">
+            <div class="flex justify-between items-center px-2">
+                <h3 class="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">Registro de Actividad</h3>
+                <i class="fa-solid fa-arrow-down-short-wide text-[10px] opacity-40"></i>
+            </div>
+            
+            <div id="lista-respuestas" class="space-y-4">
+                <div class="skeleton h-24 rounded-[30px] w-full"></div>
+                <div class="skeleton h-24 rounded-[30px] w-full"></div>
+                <div class="skeleton h-24 rounded-[30px] w-full"></div>
+            </div>
+        </section>
     </main>
 
-    <button onclick="enviarRespuestas()" class="btn-submit" id="btn-enviar" style="display: none;" disabled>
-        Enviar Reporte Final
-    </button>
+    <div id="detail-modal" onclick="event.target == this && closeModal()">
+        <div class="glass w-full max-w-md overflow-hidden flex flex-col max-h-[85vh] border-orange-400/20 shadow-2xl">
+            <div class="p-8 border-b border-white/5 flex justify-between items-end">
+                <div>
+                    <span class="text-[9px] font-black text-orange-400 uppercase tracking-widest">Resumen Técnico</span>
+                    <h2 class="font-black italic text-2xl uppercase tracking-tighter">Detalles</h2>
+                </div>
+                <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div id="modal-content" class="p-8 overflow-y-auto space-y-6 no-scrollbar">
+                </div>
+
+            <div class="p-8 pt-0">
+                <button onclick="closeModal()" class="w-full bg-orange-400 text-black py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] shadow-xl shadow-orange-400/20">Finalizar Revisión</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -147,155 +142,120 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const surveyId = urlParams.get('id');
-        let surveyData = null;
-        let totalPreguntas = 0;
-        let formularioIniciado = false;
-        let startTime = Date.now();
-
-        // Aplicar Preferencias Guardadas
-        function applyStyles() {
-            const font = localStorage.getItem('fuh_font') || 'font-modern';
-            const accent = localStorage.getItem('fuh_accent') || '#e89c2c';
-            document.body.className = font;
-            document.documentElement.style.setProperty('--accent', accent);
-        }
-
-        function showToast(text) {
-            const container = document.getElementById('toast-container');
-            const t = document.createElement('div');
-            t.className = 'glass p-5 mb-3 text-[10px] font-black uppercase tracking-widest text-center border-orange-400/30';
-            t.innerText = text;
-            container.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
-        }
-
-        // Cronómetro
-        setInterval(() => {
-            const diff = Math.floor((Date.now() - startTime) / 1000);
-            const m = Math.floor(diff / 60).toString().padStart(2, '0');
-            const s = (diff % 60).toString().padStart(2, '0');
-            document.getElementById('timer').innerText = `TIEMPO TRANSCURRIDO: ${m}:${s}`;
-        }, 1000);
-
-        async function cargarEncuesta() {
-            if (!surveyId) { window.location.href = 'inicio.html'; return; }
+        async function cargarReportes() {
+            const container = document.getElementById('lista-respuestas');
+            const liveStatus = document.getElementById('live-status');
+            
+            liveStatus.innerText = "Actualizando...";
+            
             try {
-                const doc = await db.collection('encuestas').doc(surveyId).get();
-                if (!doc.exists) { window.location.href = 'inicio.html'; return; }
-                
-                surveyData = doc.data();
-                totalPreguntas = surveyData.preguntas.length;
-                document.getElementById('survey-title').innerText = surveyData.titulo;
-                renderizarPreguntas(surveyData.preguntas);
-                document.getElementById('btn-enviar').style.display = 'block';
-            } catch (e) { showToast("ERROR DE RED"); }
-        }
+                // Stats
+                const encuestasSnap = await db.collection('encuestas').get();
+                document.getElementById('total-encuestas').innerText = encuestasSnap.size;
 
-        function renderizarPreguntas(preguntas) {
-            const container = document.getElementById('questions-container');
-            container.innerHTML = '';
-            preguntas.forEach((p, index) => {
-                const div = document.createElement('div');
-                div.className = 'glass p-8 space-y-6 question-card';
-                
-                let inputHTML = p.tipo === 'texto' ? 
-                    `<input type="text" class="input-text resp-input" data-pregunta="${p.texto}" placeholder="Escribe tu respuesta..." oninput="actualizarProgreso()">` :
-                    `<div class="grid grid-cols-1 gap-3">${p.opciones.map(opt => `
-                        <div class="option-card" onclick="seleccionarOpcion(this, '${p.texto}', '${opt}')">
-                            <div class="w-5 h-5 rounded-full border-2 border-white/20 flex items-center justify-center">
-                                <div class="w-2.5 h-2.5 rounded-full bg-black opacity-0"></div>
+                const respuestasSnap = await db.collection('respuestas').orderBy('fecha', 'desc').get();
+                document.getElementById('total-respuestas').innerText = respuestasSnap.size;
+
+                container.innerHTML = '';
+
+                if (respuestasSnap.empty) {
+                    container.innerHTML = `
+                        <div class="py-20 text-center opacity-20">
+                            <i class="fa-solid fa-box-open text-5xl mb-4"></i>
+                            <p class="text-xs font-black uppercase">Sin datos en la nube</p>
+                        </div>`;
+                    return;
+                }
+
+                respuestasSnap.forEach((doc, index) => {
+                    const r = doc.data();
+                    const fecha = r.fecha ? r.fecha.toDate().toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '---';
+                    const hora = r.fecha ? r.fecha.toDate().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '';
+                    
+                    container.innerHTML += `
+                        <div class="glass p-6 flex items-center justify-between report-card fade-in border-l-4 border-orange-400" style="animation-delay: ${index * 0.1}s" onclick="verDetalle('${doc.id}')">
+                            <div class="flex gap-4 items-center min-w-0">
+                                <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-file-invoice text-orange-400"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="font-black text-sm uppercase tracking-tight text-white truncate">${r.usuarioNombre || 'Agente Anónimo'}</h4>
+                                    <p class="text-[10px] opacity-40 font-bold uppercase truncate">${r.tituloEncuesta || 'Módulo General'}</p>
+                                </div>
                             </div>
-                            <span class="text-[13px] uppercase font-black tracking-tight">${opt}</span>
-                        </div>`).join('')}
-                        <input type="hidden" class="resp-input" data-pregunta="${p.texto}">
-                    </div>`;
+                            <div class="text-right shrink-0">
+                                <p class="text-[10px] font-black text-white">${fecha}</p>
+                                <p class="text-[8px] font-bold opacity-30 uppercase">${hora}</p>
+                            </div>
+                        </div>
+                    `;
+                });
 
-                div.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <span class="text-[9px] font-black bg-white/10 px-3 py-1 rounded-full uppercase tracking-widest opacity-60">Módulo ${index + 1}</span>
-                        <i class="fa-solid fa-circle-check text-orange-400 opacity-0 transition-all check-icon"></i>
-                    </div>
-                    <h3 class="text-xl font-black italic tracking-tighter leading-tight uppercase">${p.texto}</h3>
-                    ${inputHTML}`;
-                container.appendChild(div);
-            });
+                liveStatus.innerText = "Sincronizado";
+
+            } catch (e) {
+                console.error(e);
+                liveStatus.innerText = "Error de Red";
+            }
         }
 
-        function seleccionarOpcion(el, pregunta, valor) {
-            formularioIniciado = true;
-            const parent = el.parentElement;
-            parent.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
-            el.classList.add('selected');
-            
-            const inputHidden = parent.querySelector('input[type="hidden"]');
-            inputHidden.value = valor;
-            
-            // Marcar como completado visualmente
-            el.closest('.question-card').querySelector('.check-icon').classList.replace('opacity-0', 'opacity-100');
-            
-            actualizarProgreso();
-            
-            // Auto-scroll
-            const next = el.closest('.question-card').nextElementSibling;
-            if (next) setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400);
-        }
-
-        function actualizarProgreso() {
-            formularioIniciado = true;
-            const inputs = document.querySelectorAll('.resp-input');
-            let respondidas = 0;
-            inputs.forEach(i => { if(i.value.trim() !== '') respondidas++; });
-            
-            const porcentaje = Math.round((respondidas / totalPreguntas) * 100);
-            document.getElementById('progress-bar').style.width = porcentaje + '%';
-            document.getElementById('progress-text').innerText = porcentaje + '%';
-            document.getElementById('btn-enviar').disabled = (respondidas < totalPreguntas);
-        }
-
-        async function enviarRespuestas() {
-            const btn = document.getElementById('btn-enviar');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-sync animate-spin mr-3"></i> TRANSMITIENDO...`;
+        async function verDetalle(id) {
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="py-10 text-center">
+                    <i class="fa-solid fa-compass-drafting animate-spin text-3xl text-orange-400 mb-4"></i>
+                    <p class="text-[10px] font-black uppercase opacity-40">Extrayendo Metadata...</p>
+                </div>`;
+            document.getElementById('detail-modal').style.display = 'flex';
 
             try {
-                const user = auth.currentUser;
-                const respuestasDetalladas = {};
-                document.querySelectorAll('.resp-input').forEach(i => {
-                    respuestasDetalladas[i.getAttribute('data-pregunta')] = i.value;
-                });
+                const doc = await db.collection('respuestas').doc(id).get();
+                const data = doc.data();
+                
+                let html = `
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white/5 p-4 rounded-2xl">
+                            <p class="text-[8px] font-black opacity-30 uppercase mb-1">Operador</p>
+                            <p class="text-xs font-black text-orange-400 uppercase">${data.usuarioNombre || 'Anónimo'}</p>
+                        </div>
+                        <div class="bg-white/5 p-4 rounded-2xl">
+                            <p class="text-[8px] font-black opacity-30 uppercase mb-1">Duración</p>
+                            <p class="text-xs font-black uppercase">${data.duracion || 'N/A'}</p>
+                        </div>
+                    </div>
 
-                await db.collection('respuestas').add({
-                    encuestaId: surveyId,
-                    tituloEncuesta: surveyData.titulo,
-                    usuarioEmail: user ? user.email : 'Anonimo',
-                    respuestas: respuestasDetalladas,
-                    duracion: document.getElementById('timer').innerText,
-                    fecha: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                    <div class="space-y-3">
+                        <p class="text-[9px] font-black opacity-30 uppercase tracking-[0.2em] px-1">Respuestas del Sistema</p>
+                `;
 
-                formularioIniciado = false;
-                document.getElementById('success-screen').style.display = 'flex';
-                window.scrollTo(0,0);
+                if (data.respuestas) {
+                    Object.entries(data.respuestas).forEach(([pregunta, respuesta]) => {
+                        html += `
+                            <div class="bg-black/40 p-5 rounded-2xl border border-white/5">
+                                <p class="text-[9px] text-orange-400 font-black uppercase mb-2 leading-tight">${pregunta}</p>
+                                <p class="text-[13px] text-white/80 font-medium">${respuesta}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<p class="italic opacity-20 text-center py-10">No hay detalles estructurados.</p>`;
+                }
+
+                html += `</div>`;
+                content.innerHTML = html;
+
             } catch (e) {
-                showToast("FALLO EN LA TRANSMISIÓN");
-                btn.disabled = false;
-                btn.innerText = "REINTENTAR ENVÍO";
+                content.innerHTML = `<p class="text-center text-red-400 font-black uppercase text-[10px]">Error al cargar</p>`;
             }
         }
 
-        window.onbeforeunload = (e) => {
-            if (formularioIniciado) {
-                e.preventDefault();
-                return "Tienes cambios sin guardar.";
-            }
-        };
+        function closeModal() {
+            document.getElementById('detail-modal').style.display = 'none';
+        }
 
-        applyStyles();
-        cargarEncuesta();
+        // Inicializar
+        cargarReportes();
     </script>
 </body>
 </html>
