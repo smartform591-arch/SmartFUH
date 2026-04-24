@@ -251,14 +251,14 @@
             if (user) {
                 document.getElementById('user-display').textContent = user.email;
             } else {
-                window.location.href = 'login.html';
+                window.location.href = 'inicio.html';
             }
         });
 
         // Modal Logic
         function openModal() { document.getElementById('confirm-modal').style.display = 'flex'; }
         function closeModal() { document.getElementById('confirm-modal').style.display = 'none'; }
-        function confirmLogout() { auth.signOut().then(() => window.location.href = 'login.html'); }
+        function confirmLogout() { auth.signOut().then(() => window.location.href = 'inicio.html'); }
 
         initTheme();
     </script>
