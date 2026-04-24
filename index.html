@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>SmartFuh | Acceso</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --brand: #4a2c2a; --accent: #e89c2c; }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--brand);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        #videoBG {
+            position: fixed; inset: 0; width: 100%; height: 100%;
+            object-fit: cover; opacity: 0.25; z-index: -1; filter: grayscale(20%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            margin: 20px;
+            max-height: 90vh; /* Evita que se salga de la pantalla en móviles pequeños */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.2rem;
+            color: white;
+            outline: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .input-field:focus {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: var(--accent);
+            color: var(--brand);
+            font-weight: 800;
+            border-radius: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 15px rgba(232, 156, 44, 0.3);
+        }
+
+        /* Selector de Rol */
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: rgba(255,255,255,0.05);
+            padding: 5px;
+            border-radius: 1.2rem;
+        }
+        .role-btn {
+            padding: 10px;
+            border-radius: 1rem;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid transparent;
+            opacity: 0.5;
+        }
+        .role-btn.active {
+            background: var(--accent);
+            color: var(--brand);
+            opacity: 1;
+        }
+
+        .scroll-container {
+            overflow-y: auto;
+            padding: 5px;
+        }
+        .scroll-container::-webkit-scrollbar { width: 4px; }
+        .scroll-container::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <video autoplay muted loop playsinline id="videoBG">
+        <source src="12345.mp4" type="video/mp4">
+    </video>
+
+    <div class="glass-card p-8 md:p-10">
+        <div class="text-center mb-6 shrink-0">
+            <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-white/20">
+                <img src="1234.png" alt="Logo" class="w-10">
+            </div>
+            <h1 class="text-2xl font-black italic tracking-tighter uppercase">SmartFuh</h1>
+            <p class="text-[9px] text-orange-400 font-bold tracking-[0.2em] uppercase">Security Interface</p>
+        </div>
+
+        <div class="scroll-container">
+            
+            <div id="section-login" class="space-y-4">
+                <input type="email" id="login-email" placeholder="Correo electrónico" class="input-field">
+                <input type="password" id="login-pass" placeholder="Contraseña" class="input-field">
+                <button onclick="handleLogin()" class="btn-primary mt-2">Acceder</button>
+                <div class="flex flex-col gap-3 text-center mt-4">
+                    <span onclick="switchSection('register')" class="text-[11px] text-gray-300 font-bold cursor-pointer hover:text-orange-400 uppercase">¿No tienes cuenta? Regístrate</span>
+                    <span onclick="switchSection('forgot')" class="text-[9px] text-gray-400 cursor-pointer uppercase opacity-60">Recuperar contraseña</span>
+                </div>
+            </div>
+
+            <div id="section-register" class="hidden space-y-4">
+                <div class="space-y-2">
+                    <label class="text-[9px] font-bold uppercase opacity-50 ml-2 tracking-widest text-orange-400">Tipo de Usuario</label>
+                    <div class="role-selector">
+                        <div id="btn-role-usuario" class="role-btn active" onclick="setRole('usuario')">Usuario</div>
+                        <div id="btn-role-administrador" class="role-btn" onclick="setRole('administrador')">Admin</div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="text-[9px] font-bold uppercase opacity-50 ml-2 tracking-widest text-orange-400">Información</label>
+                    <input type="text" id="reg-name" placeholder="Nombre completo" class="input-field">
+                    <input type="tel" id="reg-phone" placeholder="Teléfono" class="input-field">
+                    <input type="text" id="reg-address" placeholder="Dirección" class="input-field">
+                    <input type="email" id="reg-email" placeholder="Correo" class="input-field">
+                    <input type="password" id="reg-pass" placeholder="Contraseña" class="input-field">
+                </div>
+
+                <button onclick="handleRegister()" class="btn-primary mt-4">Crear Cuenta</button>
+                <p onclick="switchSection('login')" class="text-center text-[10px] text-gray-400 mt-4 cursor-pointer font-bold uppercase">Volver al inicio</p>
+            </div>
+
+            <div id="section-forgot" class="hidden space-y-4 text-center">
+                <p class="text-gray-300 text-[10px] leading-relaxed uppercase font-bold px-4">Ingresa tu correo para recibir el enlace de acceso.</p>
+                <input type="email" id="forgot-email" placeholder="Correo de recuperación" class="input-field">
+                <button onclick="handleForgot()" class="btn-primary">Enviar enlace</button>
+                <p onclick="switchSection('login')" class="text-center text-[10px] text-gray-400 mt-4 cursor-pointer font-bold uppercase">Cancelar</p>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="custom-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[5000] hidden items-center justify-center p-6">
+        <div class="bg-white rounded-[2rem] p-8 max-w-xs w-full text-center">
+            <div id="modal-icon" class="text-5xl mb-3"></div>
+            <h3 id="modal-title" class="text-lg font-bold text-gray-900 mb-1 uppercase tracking-tight"></h3>
+            <p id="modal-msg" class="text-gray-500 text-xs mb-6 leading-tight"></p>
+            <button onclick="closeModal()" class="w-full bg-[#4a2c2a] text-white p-4 rounded-xl font-bold uppercase text-[10px]">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBiiY9GSlF-7r3wjBwcLCq5jyxKVOjAAE",
+            authDomain: "smartform-ee4bb.firebaseapp.com",
+            projectId: "smartform-ee4bb",
+            storageBucket: "smartform-ee4bb.firebasestorage.app",
+            messagingSenderId: "590912576678",
+            appId: "1:590912576678:web:5dd2406d46b31ada5b6867"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let selectedRole = 'usuario';
+
+        function setRole(role) {
+            selectedRole = role;
+            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-role-${role}`).classList.add('active');
+        }
+
+        function switchSection(id) {
+            ['login', 'register', 'forgot'].forEach(s => document.getElementById(`section-${s}`).classList.add('hidden'));
+            document.getElementById(`section-${id}`).classList.remove('hidden');
+        }
+
+        function showAlert(title, msg, icon) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-msg').innerText = msg;
+            document.getElementById('modal-icon').innerText = icon;
+            document.getElementById('custom-modal').classList.remove('hidden');
+            document.getElementById('custom-modal').classList.add('flex');
+        }
+
+        function closeModal() { document.getElementById('custom-modal').classList.remove('flex'); document.getElementById('custom-modal').classList.add('hidden'); }
+
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-pass').value;
+            if(!email || !pass) return showAlert("Aviso", "Ingresa tus credenciales", "🔑");
+
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+                window.location.href = 'inicio.html';
+            } catch (error) {
+                showAlert("Acceso Denegado", "Correo o contraseña incorrectos", "❌");
+            }
+        }
+
+        async function handleRegister() {
+            const name = document.getElementById('reg-name').value;
+            const phone = document.getElementById('reg-phone').value;
+            const address = document.getElementById('reg-address').value;
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+
+            if(!name || !email || !pass) return showAlert("Faltan datos", "Nombre, correo y clave son obligatorios", "📝");
+
+            try {
+                const cred = await auth.createUserWithEmailAndPassword(email, pass);
+                await db.collection('usuarios').doc(cred.user.uid).set({
+                    nombre: name,
+                    telefono: phone,
+                    direccion: address,
+                    correo: email,
+                    rol: selectedRole,
+                    fechaCreacion: new Date()
+                });
+                showAlert("Éxito", "Cuenta creada como " + selectedRole, "✅");
+                setTimeout(() => switchSection('login'), 1500);
+            } catch (error) {
+                showAlert("Error", "No se pudo registrar: " + error.message, "❌");
+            }
+        }
+
+        async function handleForgot() {
+            const email = document.getElementById('forgot-email').value;
+            if(!email) return showAlert("Correo", "Ingresa tu email", "📧");
+            try {
+                await auth.sendPasswordResetEmail(email);
+                showAlert("Enviado", "Revisa tu bandeja de entrada", "📩");
+                switchSection('login');
+            } catch (e) { showAlert("Error", "Usuario no encontrado", "❌"); }
+        }
+    </script>
+</body>
+</html>
