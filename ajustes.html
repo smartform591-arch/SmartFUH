@@ -1,199 +1,176 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <link rel="manifest" href="manifest.json">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SmartFuh">
-<link rel="apple-touch-icon" href="icon-192.png">
-
-<meta name="theme-color" content="#4a2c2a">
-
-<script>
-  // Registrar el Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('SW registrado', reg))
-        .catch(err => console.log('Error al registrar SW', err));
-    });
-  }
-</script>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>SmartFuh | Ajustes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>SmartFuh | Ajustes Titan</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;800&family=Playfair+Display:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
 
     <style>
-        :root { --brand: #4a2c2a; --accent: #e89c2c; --glass-bg: rgba(255, 255, 255, 0.1); }
+        :root { 
+            --brand: #140d0c; 
+            --accent: #e89c2c; 
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+        }
         
+        /* Tipografías Dinámicas */
+        .font-modern { font-family: 'Inter', sans-serif; }
+        .font-tech { font-family: 'JetBrains Mono', monospace; }
+        .font-elegant { font-family: 'Playfair Display', serif; }
+
         body { 
             margin: 0; background: var(--brand); color: white; 
-            font-family: 'Inter', sans-serif; padding-bottom: 40px; 
-            transition: background-color 0.4s ease, color 0.4s ease;
-            overflow-x: hidden;
+            padding-bottom: 120px; transition: all 0.5s ease; overflow-x: hidden;
         }
 
-        #videoBG { 
-            position: fixed; inset: 0; width: 100%; height: 100%; 
-            object-fit: cover; opacity: 0.15; z-index: -1; filter: grayscale(40%);
-        }
+        #videoBG { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.12; z-index: -1; }
 
         .glass { 
-            background: var(--glass-bg); 
-            backdrop-filter: blur(16px); 
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 22px;
+            background: var(--glass); backdrop-filter: blur(30px); 
+            -webkit-backdrop-filter: blur(30px); border: 1px solid var(--border); 
+            border-radius: 30px;
         }
 
-        /* Notificaciones internas */
-        #toast-container {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 9999; width: 90%; max-width: 350px; pointer-events: none;
-        }
-        .toast {
-            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white; padding: 16px 20px; border-radius: 20px;
-            margin-bottom: 10px; display: flex; align-items: center; gap: 12px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            animation: toastIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        @keyframes toastIn { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Modal de Confirmación */
-        #confirm-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            z-index: 10000; display: none; align-items: center; justify-content: center;
-            padding: 24px; backdrop-filter: blur(8px);
+        .input-elite {
+            background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+            border-radius: 16px; padding: 14px; color: white; font-size: 14px; outline: none; width: 100%;
         }
 
-        /* Switch Custom */
+        /* Botón Flotante de Inicio */
+        .home-btn {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+            background: var(--accent); color: #140d0c; border-radius: 20px;
+            display: flex; items-center; justify-content: center; font-size: 24px;
+            box-shadow: 0 10px 30px rgba(232, 156, 44, 0.4); z-index: 999;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .home-btn:active { transform: scale(0.9) rotate(-10deg); }
+
+        /* Switches */
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { 
-            position: absolute; cursor: pointer; inset: 0; 
-            background-color: rgba(255,255,255,0.2); 
-            transition: .4s; border-radius: 34px; 
-        }
-        .slider:before { 
-            position: absolute; content: ""; height: 18px; width: 18px; 
-            left: 3px; bottom: 3px; background-color: white; 
-            transition: .4s; border-radius: 50%;
-        }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: rgba(255,255,255,0.05); transition: .4s; border-radius: 34px; border: 1px solid var(--border); }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        /* Modo Claro */
-        body.light-mode { background: #f8fafc; color: #1e293b; }
-        body.light-mode #videoBG { opacity: 0.05; }
-        body.light-mode .glass { 
-            background: white; border-color: rgba(0,0,0,0.05); 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-        }
+        .accent-dot { width: 30px; height: 30px; border-radius: 10px; cursor: pointer; border: 3px solid transparent; }
+        .accent-dot.active { border-color: white; transform: translateY(-5px); }
+        
+        #admin-panel { display: none; }
     </style>
 </head>
-<body>
+<body class="font-modern">
 
     <video autoplay muted loop playsinline id="videoBG">
         <source src="12345.mp4" type="video/mp4">
     </video>
 
-    <div id="toast-container"></div>
+    <a href="inicio.html" class="home-btn">
+        <i class="fa-solid fa-house"></i>
+    </a>
 
-    <div id="confirm-modal">
-        <div class="glass w-full max-w-xs p-8 text-center space-y-6">
-            <div class="w-16 h-16 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto">
-                <i class="fa-solid fa-power-off text-2xl"></i>
+    <div id="update-modal" class="fixed inset-0 bg-black/95 z-[10000] hidden items-center justify-center p-6 backdrop-blur-2xl">
+        <div class="glass p-10 w-full max-w-sm text-center space-y-6">
+            <div class="w-20 h-20 bg-orange-500 rounded-3xl flex items-center justify-center mx-auto shadow-2xl">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl text-white"></i>
             </div>
-            <h3 class="font-black italic text-xl uppercase">¿Cerrar Sesión?</h3>
-            <div class="flex gap-3">
-                <button onclick="closeModal()" class="flex-1 p-4 rounded-2xl bg-white/5 font-black text-[10px] uppercase">Cancelar</button>
-                <button onclick="confirmLogout()" class="flex-1 p-4 rounded-2xl bg-red-500 text-white font-black text-[10px] uppercase">Salir</button>
-            </div>
+            <h2 data-i18n="update_title" class="text-2xl font-black uppercase">Nueva Mejora</h2>
+            <p id="modal-v-notes" class="text-sm opacity-60 italic"></p>
+            <button onclick="location.reload()" data-i18n="update_btn" class="w-full py-4 bg-white text-black font-black uppercase text-[10px] rounded-2xl">Actualizar</button>
         </div>
     </div>
 
-    <header class="p-8 pt-16">
-        <div class="flex items-center gap-4 mb-6">
-            <a href="inicio.html" class="w-10 h-10 glass flex items-center justify-center text-white hover:bg-white/20 transition">
-                <i class="fa-solid fa-chevron-left text-xs"></i>
-            </a>
-            <h1 class="text-4xl font-black italic tracking-tighter">AJUSTES</h1>
+    <div id="toast-container"></div>
+
+    <header class="p-8 pt-20 flex justify-between items-start">
+        <div class="space-y-1">
+            <div class="flex items-center gap-2 mb-2">
+                <button onclick="changeLang('es')" class="text-[9px] font-black opacity-40 hover:opacity-100">ES</button>
+                <span class="opacity-20">|</span>
+                <button onclick="changeLang('en')" class="text-[9px] font-black opacity-40 hover:opacity-100">EN</button>
+            </div>
+            <h1 data-i18n="nav_title" class="text-4xl font-black italic tracking-tighter uppercase leading-tight">Configuración</h1>
         </div>
-        <div class="h-1 w-12 bg-orange-400 rounded-full"></div>
+        <div class="text-right">
+            <div id="network-status" class="px-3 py-1 rounded-full bg-green-500/10 text-green-500 text-[8px] font-black uppercase border border-green-500/20">Online</div>
+            <p id="session-time" class="text-[8px] opacity-40 font-bold mt-2 uppercase italic">00:00 session</p>
+        </div>
     </header>
 
     <main class="px-6 space-y-6">
-        
-        <section class="space-y-3">
-            <h3 class="text-[11px] font-bold opacity-50 uppercase tracking-[0.2em] ml-2">Preferencia Visual</h3>
-            <div class="glass p-5 space-y-6">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 flex items-center justify-center rounded-full bg-orange-400/20 text-orange-400">
-                            <i class="fa-solid fa-circle-half-stroke"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold">Modo Oscuro</p>
-                            <p class="text-[10px] opacity-60">Alternar tema visual</p>
-                        </div>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="dark-mode-toggle" checked onchange="toggleDarkMode()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
 
+        <section class="glass p-6 flex items-center gap-5">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-red-600 flex items-center justify-center text-white text-2xl font-black shadow-xl" id="user-initials">--</div>
+            <div class="flex-1">
+                <input type="text" id="display-name-input" class="bg-transparent border-none p-0 w-full font-black text-xl outline-none" placeholder="User">
+                <p id="user-email-label" class="text-[10px] opacity-40 font-bold uppercase tracking-widest italic">Cargando...</p>
+            </div>
+            <button onclick="updateProfile()" class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-orange-400 border border-white/5">
+                <i class="fa-solid fa-floppy-disk"></i>
+            </button>
+        </section>
+
+        <section id="admin-panel" class="glass p-6 space-y-4 border-orange-500/30">
+            <h3 class="text-[10px] font-black text-orange-500 uppercase tracking-[0.3em]">Developer Engine</h3>
+            <input type="text" id="admin-v-input" class="input-elite" placeholder="Versión: 2.0.0">
+            <textarea id="admin-notes-input" class="input-elite h-20" placeholder="Cambios..."></textarea>
+            <button onclick="pushUpdate()" class="w-full py-4 bg-orange-500 text-black font-black text-[11px] uppercase rounded-xl">Publicar Sistema</button>
+        </section>
+
+        <section class="space-y-3">
+            <h3 data-i18n="sec_font" class="text-[10px] font-black opacity-30 uppercase tracking-[0.2em] ml-2">Estilo de Texto</h3>
+            <div class="glass p-4 flex gap-3">
+                <button onclick="setFont('font-modern')" class="flex-1 py-3 glass text-[10px] font-black uppercase rounded-xl hover:bg-white/10">Modern</button>
+                <button onclick="setFont('font-tech')" class="flex-1 py-3 glass text-[10px] font-black uppercase rounded-xl hover:bg-white/10">Tech</button>
+                <button onclick="setFont('font-elegant')" class="flex-1 py-3 glass text-[10px] font-black uppercase rounded-xl hover:bg-white/10">Classic</button>
+            </div>
+        </section>
+
+        <section class="space-y-3">
+            <h3 data-i18n="sec_style" class="text-[10px] font-black opacity-30 uppercase tracking-[0.2em] ml-2">Apariencia</h3>
+            <div class="glass p-6 space-y-6">
                 <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-400/20 text-blue-400">
-                            <i class="fa-solid fa-bell"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold">Notificaciones</p>
-                            <p class="text-[10px] opacity-60">Alertas del sistema</p>
-                        </div>
+                    <span data-i18n="opt_accent" class="text-sm font-bold">Color Principal</span>
+                    <div class="flex gap-2">
+                        <div class="accent-dot bg-orange-500 active" onclick="setAccent('#e89c2c', this)"></div>
+                        <div class="accent-dot bg-cyan-400" onclick="setAccent('#22d3ee', this)"></div>
+                        <div class="accent-dot bg-pink-500" onclick="setAccent('#ec4899', this)"></div>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p data-i18n="opt_saver" class="text-sm font-bold">Modo Ahorro</p>
+                        <p class="text-[9px] opacity-40 font-bold uppercase">Static Background</p>
                     </div>
                     <label class="switch">
-                        <input type="checkbox" id="notify-toggle" onchange="toggleNotifications()">
+                        <input type="checkbox" id="data-saver" onchange="toggleVideo()">
                         <span class="slider"></span>
                     </label>
                 </div>
             </div>
         </section>
 
-        <section class="space-y-3">
-            <h3 class="text-[11px] font-bold opacity-50 uppercase tracking-[0.2em] ml-2">Cuenta y Seguridad</h3>
-            <div class="glass p-2">
-                <button onclick="window.location.href='perfil.html'" class="flex justify-between items-center w-full p-4 hover:bg-white/5 rounded-xl transition">
-                    <div class="flex items-center gap-4">
-                        <i class="fa-solid fa-user-shield opacity-70"></i>
-                        <span class="text-sm font-semibold">Gestionar Perfil</span>
-                    </div>
-                    <i class="fa-solid fa-angle-right text-xs opacity-30"></i>
-                </button>
-                
-                <div class="h-[1px] bg-white/5 mx-4"></div>
-
-                <button onclick="openModal()" class="flex justify-between items-center w-full p-4 text-red-400 group">
-                    <div class="flex items-center gap-4">
-                        <i class="fa-solid fa-power-off"></i>
-                        <span class="text-sm font-bold">Finalizar Sesión</span>
-                    </div>
-                </button>
+        <section class="glass p-6 space-y-2">
+            <h3 class="text-[10px] font-black opacity-30 uppercase tracking-[0.2em] mb-4">System Data</h3>
+            <div class="flex justify-between text-[10px] font-bold">
+                <span class="opacity-40 uppercase">Resolución</span>
+                <span id="screen-res">---</span>
+            </div>
+            <div class="flex justify-between text-[10px] font-bold">
+                <span class="opacity-40 uppercase">Motor</span>
+                <span id="browser-info">---</span>
             </div>
         </section>
 
-        <footer class="text-center opacity-40 pt-12">
-            <p class="text-[10px] font-black tracking-widest uppercase">SmartFuh v1.0.4</p>
-            <p id="user-display" class="text-[9px] mt-1 italic text-orange-400">Sincronizando sesión...</p>
-        </footer>
+        <button onclick="handleLogout()" class="w-full py-6 glass text-red-500 font-black text-[12px] uppercase tracking-[0.4em] flex items-center justify-center gap-4">
+            <i class="fa-solid fa-power-off"></i>
+            <span data-i18n="btn_logout">Cerrar Sesión</span>
+        </button>
 
     </main>
 
@@ -212,55 +189,134 @@
         };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
+        const db = firebase.firestore();
 
-        function showToast(msg) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<i class="fa-solid fa-circle-check text-orange-400"></i><span class="text-[10px] font-bold uppercase">${msg}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
-        }
+        // RECUERDA CAMBIAR ESTE CORREO POR EL TUYO
+        const ADMIN_EMAIL = "tu-correo@gmail.com";
 
-        function initTheme() {
-            const isDark = localStorage.getItem('theme') !== 'light';
-            document.getElementById('dark-mode-toggle').checked = isDark;
-            document.body.classList.toggle('light-mode', !isDark);
-        }
-
-        function toggleDarkMode() {
-            const isChecked = document.getElementById('dark-mode-toggle').checked;
-            document.body.classList.toggle('light-mode', !isChecked);
-            localStorage.setItem('theme', isChecked ? 'dark' : 'light');
-        }
-
-        async function toggleNotifications() {
-            const toggle = document.getElementById('notify-toggle');
-            if (toggle.checked) {
-                const permission = await Notification.requestPermission();
-                if (permission === "granted") {
-                    showToast("Notificaciones activas");
-                } else {
-                    toggle.checked = false;
-                    showToast("Permiso denegado");
-                }
+        // DICCIONARIO MULTILENGUAJE
+        const translations = {
+            es: {
+                nav_title: "Ajustes",
+                update_title: "Mejora Lista",
+                update_btn: "Instalar",
+                sec_font: "Tipo de Letra",
+                sec_style: "Estilo Visual",
+                opt_accent: "Color de Acento",
+                opt_saver: "Ahorro de Datos",
+                btn_logout: "Cerrar Sesión"
+            },
+            en: {
+                nav_title: "Settings",
+                update_title: "Update Ready",
+                update_btn: "Install",
+                sec_font: "Typography",
+                sec_style: "Visual Style",
+                opt_accent: "Accent Color",
+                opt_saver: "Data Saver",
+                btn_logout: "Sign Out"
             }
+        };
+
+        // --- SISTEMA DE LENGUAJE ---
+        function changeLang(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.innerText = translations[lang][key];
+            });
+            localStorage.setItem('fuh_lang', lang);
         }
 
+        // --- SISTEMA DE FUENTES ---
+        function setFont(fontClass) {
+            document.body.classList.remove('font-modern', 'font-tech', 'font-elegant');
+            document.body.classList.add(fontClass);
+            localStorage.setItem('fuh_font', fontClass);
+            showToast("Fuente Actualizada");
+        }
+
+        // --- INFO DE HARDWARE ---
+        document.getElementById('screen-res').innerText = `${window.screen.width}x${window.screen.height}`;
+        document.getElementById('browser-info').innerText = navigator.vendor || 'Webkit Engine';
+
+        // --- CORE FIREBASE ---
         auth.onAuthStateChanged(user => {
             if (user) {
-                document.getElementById('user-display').textContent = user.email;
-            } else {
-                window.location.href = 'inicio.html';
-            }
+                document.getElementById('user-email-label').innerText = user.email;
+                document.getElementById('display-name-input').value = user.displayName || "";
+                document.getElementById('user-initials').innerText = (user.displayName || user.email).substring(0, 2).toUpperCase();
+                if (user.email === ADMIN_EMAIL) document.getElementById('admin-panel').style.display = 'block';
+                checkUpdates();
+            } else { window.location.href = 'index.html'; }
         });
 
-        // Modal Logic
-        function openModal() { document.getElementById('confirm-modal').style.display = 'flex'; }
-        function closeModal() { document.getElementById('confirm-modal').style.display = 'none'; }
-        function confirmLogout() { auth.signOut().then(() => window.location.href = 'inicio.html'); }
+        async function updateProfile() {
+            const name = document.getElementById('display-name-input').value;
+            await auth.currentUser.updateProfile({ displayName: name });
+            document.getElementById('user-initials').innerText = name.substring(0, 2).toUpperCase();
+            showToast("Sincronizado");
+        }
 
-        initTheme();
+        function setAccent(color, el) {
+            document.documentElement.style.setProperty('--accent', color);
+            document.querySelectorAll('.accent-dot').forEach(d => d.classList.remove('active'));
+            el.classList.add('active');
+            localStorage.setItem('fuh_accent', color);
+        }
+
+        function toggleVideo() {
+            const isSaving = document.getElementById('data-saver').checked;
+            document.getElementById('videoBG').style.opacity = isSaving ? '0' : '0.12';
+            localStorage.setItem('fuh_datasaver', isSaving);
+        }
+
+        async function pushUpdate() {
+            const v = document.getElementById('admin-v-input').value;
+            const n = document.getElementById('admin-notes-input').value;
+            await db.collection('system').doc('version_control').set({
+                currentVersion: v, releaseNotes: n, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast("Build Propagada");
+        }
+
+        async function checkUpdates() {
+            const doc = await db.collection('system').doc('version_control').get();
+            if (doc.exists && doc.data().currentVersion !== localStorage.getItem('fuh_version')) {
+                document.getElementById('modal-v-notes').innerText = doc.data().releaseNotes;
+                document.getElementById('update-modal').classList.replace('hidden', 'flex');
+                localStorage.setItem('fuh_version', doc.data().currentVersion);
+            }
+        }
+
+        function showToast(msg) {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'bg-white text-black px-6 py-3 rounded-2xl font-black text-[10px] uppercase mb-2 text-center shadow-2xl';
+            t.innerText = msg;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
+
+        function handleLogout() { auth.signOut(); }
+
+        // SESIÓN TIMER
+        let startTime = Date.now();
+        setInterval(() => {
+            let diff = Math.floor((Date.now() - startTime) / 1000);
+            let mins = Math.floor(diff / 60).toString().padStart(2, '0');
+            let secs = (diff % 60).toString().padStart(2, '0');
+            document.getElementById('session-time').innerText = `${mins}:${secs} session`;
+        }, 1000);
+
+        // AUTO-LOAD PREFERENCES
+        const savedLang = localStorage.getItem('fuh_lang') || 'es';
+        changeLang(savedLang);
+
+        const savedFont = localStorage.getItem('fuh_font');
+        if(savedFont) setFont(savedFont);
+
+        const savedAccent = localStorage.getItem('fuh_accent');
+        if(savedAccent) document.documentElement.style.setProperty('--accent', savedAccent);
     </script>
 </body>
 </html>
