@@ -1,0 +1,11 @@
+{
+  "name": "SmartFuh Surveys",
+  "short_name": "SmartFuh",
+  "start_url": "smartform.app.html",
+  "display": "standalone",
+  "background_color": "#f2ebe2",
+  "theme_color": "#4a2c2a",
+  "icons": [
+    { "src": "1234.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

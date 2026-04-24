@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>SmartFuh | Creador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --brand: #4a2c2a; --accent: #e89c2c; }
+        body { 
+            margin: 0; background: var(--brand); color: white; 
+            font-family: 'Inter', sans-serif; padding-bottom: 120px; 
+        }
+        #videoBG { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.2; z-index: -1; }
+        
+        .glass { 
+            background: rgba(255, 255, 255, 0.08); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.12); 
+            border-radius: 28px; 
+        }
+        
+        .input-pro { 
+            width: 100%; background: rgba(255,255,255,0.05); 
+            border: 1.5px solid rgba(255,255,255,0.1); 
+            border-radius: 18px; padding: 15px; color: white; 
+            outline: none; transition: 0.3s; font-size: 14px;
+        }
+        .input-pro:focus { border-color: var(--accent); background: rgba(255,255,255,0.1); }
+
+        .btn-add { 
+            background: rgba(255,255,255,0.1); color: var(--accent); 
+            font-weight: 800; padding: 18px; border-radius: 20px; 
+            width: 100%; text-transform: uppercase; border: 2px dashed var(--accent);
+            transition: 0.3s;
+        }
+        .btn-add:active { transform: scale(0.95); background: rgba(232, 156, 44, 0.1); }
+
+        .btn-save { 
+            background: var(--accent); color: var(--brand); 
+            font-weight: 900; padding: 20px; border-radius: 24px; 
+            width: 85%; position: fixed; bottom: 30px; left: 50%; 
+            transform: translateX(-50%); max-width: 400px; z-index: 100; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5); text-transform: uppercase;
+        }
+        
+        /* Notificaciones internas (Toast) */
+        #toast-container {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 9999; width: 90%; max-width: 350px; pointer-events: none;
+        }
+        .toast {
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white; padding: 16px 20px; border-radius: 20px;
+            margin-bottom: 10px; display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            animation: toastIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+        .toast.error { border-left: 5px solid #ef4444; }
+        .toast.success { border-left: 5px solid #22c55e; }
+
+        .pregunta-card { animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        select option { background: var(--brand); color: white; }
+    </style>
+</head>
+<body>
+
+    <video autoplay muted loop playsinline id="videoBG"><source src="12345.mp4" type="video/mp4"></video>
+
+    <div id="toast-container"></div>
+
+    <header class="p-8 pt-12 flex items-center justify-between">
+        <button onclick="window.location.href='inicio.html'" class="w-12 h-12 glass flex items-center justify-center">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <div class="text-right">
+            <h1 class="text-xl font-black italic tracking-tighter">CREADOR</h1>
+            <p class="text-[9px] uppercase font-black text-orange-400 tracking-[0.2em]">SmartFuh Studio</p>
+        </div>
+    </header>
+
+    <main class="px-6 space-y-6 pb-20">
+        <section class="glass p-6 space-y-4">
+            <p class="text-[10px] font-black text-orange-400 uppercase tracking-widest">General</p>
+            <input type="text" id="survey-title" class="input-pro font-bold" placeholder="Título de la Encuesta">
+            <textarea id="survey-desc" class="input-pro h-24" placeholder="Breve descripción para los usuarios..."></textarea>
+        </section>
+
+        <div id="preguntas-container" class="space-y-6"></div>
+
+        <button onclick="agregarPregunta()" class="btn-add">
+            <i class="fa-solid fa-plus-circle mr-2"></i> Nueva Pregunta
+        </button>
+    </main>
+
+    <button onclick="guardarEncuesta()" class="btn-save" id="btn-publicar">
+        <i class="fa-solid fa-rocket mr-2"></i> Publicar Ahora
+    </button>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBiiY9GSlF-7r3wjBwcLCq5jyxKVOjAAE",
+            authDomain: "smartform-ee4bb.firebaseapp.com",
+            projectId: "smartform-ee4bb",
+            storageBucket: "smartform-ee4bb.firebasestorage.app",
+            messagingSenderId: "590912576678",
+            appId: "1:590912576678:web:5dd2406d46b31ada5b6867"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Función para mostrar mensajes dentro del sistema
+        function showMessage(text, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-circle-exclamation' : 'fa-info-circle');
+            
+            toast.innerHTML = `
+                <i class="fa-solid ${icon}"></i>
+                <span class="text-xs font-bold uppercase tracking-tight">${text}</span>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        let preguntasCount = 0;
+
+        function agregarPregunta() {
+            preguntasCount++;
+            const div = document.createElement('div');
+            div.className = 'glass p-6 pregunta-card space-y-4';
+            div.id = `pregunta-${preguntasCount}`;
+            div.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-black bg-orange-400 text-[#4a2c2a] px-3 py-1 rounded-full uppercase">Pregunta ${preguntasCount}</span>
+                    <button onclick="eliminarPregunta(${preguntasCount})" class="text-red-400 w-8 h-8 glass flex items-center justify-center">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+                <input type="text" class="input-pro q-text font-bold" placeholder="¿Qué quieres preguntar?">
+                <select class="input-pro q-type w-full" onchange="toggleOpciones(${preguntasCount}, this.value)">
+                    <option value="texto">Texto Libre</option>
+                    <option value="opciones">Selección</option>
+                </select>
+                <div id="opciones-box-${preguntasCount}" class="hidden space-y-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+                    <div id="list-opts-${preguntasCount}" class="space-y-2">
+                        <input type="text" class="input-pro text-xs q-opt" placeholder="Opción 1">
+                        <input type="text" class="input-pro text-xs q-opt" placeholder="Opción 2">
+                    </div>
+                    <button onclick="añadirOpcionInput(${preguntasCount})" class="text-[10px] font-bold text-orange-400 uppercase">
+                        <i class="fa-solid fa-plus mr-1"></i> Añadir otra opción
+                    </button>
+                </div>
+            `;
+            document.getElementById('preguntas-container').appendChild(div);
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function toggleOpciones(id, val) {
+            const box = document.getElementById(`opciones-box-${id}`);
+            val === 'opciones' ? box.classList.remove('hidden') : box.classList.add('hidden');
+        }
+
+        function añadirOpcionInput(id) {
+            const container = document.getElementById(`list-opts-${id}`);
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'input-pro text-xs q-opt';
+            input.placeholder = `Nueva Opción`;
+            container.appendChild(input);
+        }
+
+        function eliminarPregunta(id) {
+            const el = document.getElementById(`pregunta-${id}`);
+            el.style.transform = "translateX(100px)";
+            el.style.opacity = "0";
+            setTimeout(() => el.remove(), 300);
+        }
+
+        async function guardarEncuesta() {
+            const titulo = document.getElementById('survey-title').value.trim();
+            const desc = document.getElementById('survey-desc').value.trim();
+            const btn = document.getElementById('btn-publicar');
+            
+            if(!titulo) return showMessage("Falta el título", "error");
+
+            const cards = document.querySelectorAll('.pregunta-card');
+            const listaPreguntas = [];
+
+            cards.forEach(card => {
+                const texto = card.querySelector('.q-text')?.value.trim();
+                if(!texto) return;
+
+                const tipo = card.querySelector('.q-type').value;
+                let opciones = [];
+                
+                if(tipo === 'opciones') {
+                    const opts = card.querySelectorAll('.q-opt');
+                    opts.forEach(o => { if(o.value.trim()) opciones.push(o.value.trim()); });
+                }
+                listaPreguntas.push({ texto, tipo, opciones });
+            });
+
+            if(listaPreguntas.length === 0) return showMessage("Agrega al menos una pregunta", "error");
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-2"></i> PUBLICANDO...`;
+                
+                const user = auth.currentUser;
+                await db.collection('encuestas').add({
+                    titulo: titulo,
+                    descripcion: desc,
+                    preguntas: listaPreguntas,
+                    creadoPor: user ? user.uid : 'admin_manual',
+                    creadoPorNombre: user ? (user.displayName || user.email) : 'Admin',
+                    fecha: new Date(),
+                    totalPreguntas: listaPreguntas.length
+                });
+
+                showMessage("¡Publicado con éxito!", "success");
+                setTimeout(() => window.location.href = 'inicio.html', 1500);
+                
+            } catch (e) {
+                showMessage("Error al subir", "error");
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-rocket mr-2"></i> Publicar Ahora`;
+            }
+        }
+
+        agregarPregunta();
+    </script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>SmartFuh | Mi Perfil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --brand: #4a2c2a; --accent: #e89c2c; }
+        body { 
+            margin: 0; background: var(--brand); color: white; 
+            font-family: 'Inter', sans-serif; padding-bottom: 40px;
+        }
+        #videoBG { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.2; z-index: -1; filter: grayscale(30%); }
+        
+        .glass { 
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            border-radius: 28px; 
+        }
+
+        /* Notificaciones internas */
+        #toast-container {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 9999; width: 90%; max-width: 350px; pointer-events: none;
+        }
+        .toast {
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white; padding: 16px 20px; border-radius: 20px;
+            margin-bottom: 10px; display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            animation: toastIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Modal de Confirmación Estilizado */
+        #confirm-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            z-index: 10000; display: none; align-items: center; justify-content: center;
+            padding: 24px; backdrop-filter: blur(8px);
+        }
+
+        .avatar-container {
+            position: relative;
+            display: inline-block;
+        }
+        .avatar-container::after {
+            content: '';
+            position: absolute; inset: -4px;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <video autoplay muted loop playsinline id="videoBG">
+        <source src="12345.mp4" type="video/mp4">
+    </video>
+
+    <div id="toast-container"></div>
+
+    <div id="confirm-modal">
+        <div class="glass w-full max-w-xs p-8 text-center space-y-6">
+            <div class="w-16 h-16 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto">
+                <i class="fa-solid fa-door-open text-2xl"></i>
+            </div>
+            <div>
+                <h3 class="font-black italic text-xl uppercase">¿Cerrar Sesión?</h3>
+                <p class="text-[11px] opacity-60 font-bold uppercase tracking-widest mt-1">Estas seguro de cerrar sesion?</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeLogoutModal()" class="flex-1 p-4 rounded-2xl bg-white/5 font-black text-[10px] uppercase tracking-widest">Cancelar</button>
+                <button onclick="confirmLogout()" class="flex-1 p-4 rounded-2xl bg-red-500 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-red-500/20">Salir</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="p-8 pt-16 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <a href="inicio.html" class="w-10 h-10 glass flex items-center justify-center text-white">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+            </a>
+            <h1 class="text-3xl font-black italic tracking-tighter">MI CUENTA</h1>
+        </div>
+    </header>
+
+    <main class="px-6 space-y-4">
+        <section class="glass p-8 flex flex-col items-center text-center">
+            <div class="avatar-container mb-4">
+                <div id="p-avatar-bg" class="w-24 h-24 rounded-full bg-gradient-to-tr from-orange-500 to-yellow-400 flex items-center justify-center text-4xl font-black shadow-xl border-4 border-white/10">
+                    <span id="p-avatar">?</span>
+                </div>
+            </div>
+            <h2 id="p-nombre" class="text-2xl font-black mb-1 italic tracking-tight">Cargando...</h2>
+            <p id="p-rol" class="text-[11px] uppercase tracking-[0.2em] text-orange-400 font-extrabold italic">Verificando acceso...</p>
+        </section>
+
+        <section class="glass overflow-hidden">
+            <div class="p-6 space-y-5">
+                <div class="flex flex-col gap-1">
+                    <span class="text-[9px] uppercase font-bold opacity-40 tracking-widest">Correo Electrónico</span>
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-envelope text-orange-400 text-xs"></i>
+                        <span id="p-correo" class="text-sm font-semibold truncate opacity-90">...</span>
+                    </div>
+                </div>
+
+                <div class="h-[1px] bg-white/5 w-full"></div>
+
+                <div class="flex flex-col gap-1">
+                    <span class="text-[9px] uppercase font-bold opacity-40 tracking-widest">Teléfono de Contacto</span>
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-phone text-orange-400 text-xs"></i>
+                        <span id="p-telefono" class="text-sm font-semibold opacity-90">...</span>
+                    </div>
+                </div>
+
+                <div class="h-[1px] bg-white/5 w-full"></div>
+
+                <div class="flex flex-col gap-1">
+                    <span class="text-[9px] uppercase font-bold opacity-40 tracking-widest">Dirección Registrada</span>
+                    <div class="flex items-start gap-3">
+                        <i class="fa-solid fa-location-dot text-orange-400 text-xs mt-1"></i>
+                        <span id="p-direccion" class="text-sm font-semibold leading-tight opacity-90">...</span>
+                    </div>
+                </div>
+
+                <div class="h-[1px] bg-white/5 w-full"></div>
+
+                <div class="flex flex-col gap-1">
+                    <span class="text-[9px] uppercase font-bold opacity-40 tracking-widest">Protocolo UID</span>
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-fingerprint text-orange-400 text-xs"></i>
+                        <span id="p-uid" class="text-[10px] font-mono opacity-50 truncate">...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="pt-4">
+            <button onclick="openLogoutModal()" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 p-5 rounded-[24px] font-black border border-red-500/20 flex items-center justify-center gap-3 transition-all active:scale-95">
+                <i class="fa-solid fa-power-off"></i>
+                CERRAR SESIÓN
+            </button>
+            <p class="text-center text-[9px] opacity-30 font-bold uppercase tracking-widest mt-6 italic">Secure Interface v2.0</p>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBiiY9GSlF-7r3wjBwcLCq5jyxKVOjAAE",
+            authDomain: "smartform-ee4bb.firebaseapp.com",
+            projectId: "smartform-ee4bb",
+            storageBucket: "smartform-ee4bb.firebasestorage.app",
+            messagingSenderId: "590912576678",
+            appId: "1:590912576678:web:5dd2406d46b31ada5b6867"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        function showMessage(text, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info text-orange-400"></i>
+                               <span class="text-[10px] font-bold uppercase tracking-tight">${text}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const userDoc = await db.collection('usuarios').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const data = userDoc.data();
+                        document.getElementById('p-nombre').innerText = data.nombre || "Usuario";
+                        document.getElementById('p-correo').innerText = user.email;
+                        document.getElementById('p-uid').innerText = user.uid;
+                        document.getElementById('p-rol').innerText = (data.rol || 'usuario').toUpperCase();
+                        document.getElementById('p-telefono').innerText = data.telefono || "No definido";
+                        document.getElementById('p-direccion').innerText = data.direccion || "No registrada";
+                        
+                        const inicial = data.nombre ? data.nombre.charAt(0).toUpperCase() : '?';
+                        document.getElementById('p-avatar').innerText = inicial;
+                    }
+                } catch (error) {
+                    showMessage("Error al sincronizar datos");
+                }
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Funciones del Modal de Cierre de Sesión
+        function openLogoutModal() {
+            document.getElementById('confirm-modal').style.display = 'flex';
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('confirm-modal').style.display = 'none';
+        }
+
+        function confirmLogout() {
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
+            });
+        }
+    </script>
+</body>
+</html>
