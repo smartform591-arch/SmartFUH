@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>SmartFuh | Buscar Elite</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --brand: #1a0f0e; --accent: #e89c2c; }
+        body { 
+            margin: 0; background: var(--brand); color: white; 
+            font-family: 'Inter', sans-serif; padding-bottom: 120px; 
+            overflow-x: hidden;
+        }
+        #videoBG { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.12; z-index: -1; filter: contrast(120%) grayscale(0.5); }
+        
+        .glass { 
+            background: rgba(255, 255, 255, 0.04); 
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 28px; 
+        }
+
+        .search-container {
+            position: sticky; top: 0; z-index: 50;
+            padding: 25px 24px 15px 24px; 
+            background: linear-gradient(to bottom, var(--brand) 70%, transparent);
+        }
+        
+        .search-wrapper { position: relative; }
+        
+        .search-input {
+            width: 100%; background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 22px; padding: 18px 50px 18px 55px;
+            color: white; outline: none; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600; font-size: 15px;
+        }
+        .search-input:focus { border-color: var(--accent); background: rgba(0,0,0,0.4); box-shadow: 0 0 30px rgba(232, 156, 44, 0.15); }
+
+        .chip {
+            padding: 10px 22px; border-radius: 16px; font-size: 9px; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 1.5px; transition: 0.3s;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            white-space: nowrap; cursor: pointer; color: rgba(255,255,255,0.4);
+        }
+        .chip.active { background: var(--accent); color: var(--brand); border-color: var(--accent); box-shadow: 0 8px 20px rgba(232, 156, 44, 0.2); }
+
+        /* Estilo de Carga (Skeleton) */
+        .skeleton { height: 80px; width: 100%; background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%); background-size: 200% 100%; animation: loading 1.5s infinite; border-radius: 24px; }
+        @keyframes loading { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+        /* Bottom Nav Premium */
+        .bottom-nav {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 92%; max-width: 420px; height: 75px;
+            background: rgba(26, 15, 14, 0.85); backdrop-filter: blur(35px);
+            border-radius: 35px; display: flex; justify-content: space-around; 
+            align-items: center; z-index: 1000; border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: rgba(255,255,255,0.25); text-decoration: none; transition: 0.3s; }
+        .nav-item.active { color: var(--accent); }
+        .nav-center-wrapper { position: relative; top: -20px; }
+        .nav-center {
+            width: 60px; height: 60px; background: var(--accent);
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            color: var(--brand); transform: rotate(45deg); border: 4px solid var(--brand);
+            box-shadow: 0 10px 20px rgba(232, 156, 44, 0.3);
+        }
+        .nav-center i { transform: rotate(-45deg); font-size: 1.4rem; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .fade-up { animation: fadeUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; opacity: 0; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <video autoplay muted loop playsinline id="videoBG">
+        <source src="12345.mp4" type="video/mp4">
+    </video>
+
+    <div class="search-container">
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-black tracking-tighter italic uppercase">Explorar</h1>
+            <span id="resultsCount" class="text-[10px] font-black bg-white/10 px-3 py-1 rounded-full opacity-40 uppercase tracking-widest">---</span>
+        </header>
+
+        <div class="search-wrapper mb-6">
+            <i class="fa-solid fa-magnifying-glass absolute left-6 top-1/2 -translate-y-1/2 text-orange-400 opacity-60"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Nombre de tarea o ID..." oninput="filtrarEncuestas()">
+            <button onclick="clearSearch()" id="clearBtn" class="absolute right-6 top-1/2 -translate-y-1/2 text-white/20 hover:text-white hidden">
+                <i class="fa-solid fa-circle-xmark"></i>
+            </button>
+        </div>
+
+        <div class="flex gap-3 overflow-x-auto pb-4 no-scrollbar">
+            <div class="chip active" onclick="filtrarCategoria(this, 'todas')">Todo</div>
+            <div class="chip" onclick="filtrarCategoria(this, 'seguridad')">Seguridad</div>
+            <div class="chip" onclick="filtrarCategoria(this, 'logistica')">Logística</div>
+            <div class="chip" onclick="filtrarCategoria(this, 'mantenimiento')">Mantenimiento</div>
+            <div class="chip" onclick="filtrarCategoria(this, 'otros')">Otros</div>
+        </div>
+    </div>
+
+    <main class="px-6 space-y-4" id="resultsContainer">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="inicio.html" class="nav-item">
+            <i class="fa-solid fa-house-chimney text-lg mb-1"></i>
+            <span class="text-[7px] font-black uppercase">Inicio</span>
+        </a>
+        <a href="responder.html" class="nav-item">
+            <i class="fa-solid fa-list-check text-lg mb-1"></i>
+            <span class="text-[7px] font-black uppercase">Tareas</span>
+        </a>
+        <a href="#" class="nav-center-wrapper">
+            <div class="nav-center"><i class="fa-solid fa-qrcode"></i></div>
+        </a>
+        <a href="perfil.html" class="nav-item">
+            <i class="fa-solid fa-circle-user text-lg mb-1"></i>
+            <span class="text-[7px] font-black uppercase">Perfil</span>
+        </a>
+        <a href="ajustes.html" class="nav-item">
+            <i class="fa-solid fa-gear text-lg mb-1"></i>
+            <span class="text-[7px] font-black uppercase">Ajustes</span>
+        </a>
+    </nav>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBiiY9GSlF-7r3wjBwcLCq5jyxKVOjAAE",
+            authDomain: "smartform-ee4bb.firebaseapp.com",
+            projectId: "smartform-ee4bb",
+            storageBucket: "smartform-ee4bb.firebasestorage.app",
+            messagingSenderId: "590912576678",
+            appId: "1:590912576678:web:5dd2406d46b31ada5b6867"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let todasLasEncuestas = [];
+
+        async function cargarEncuestas() {
+            try {
+                const snap = await db.collection('encuestas').orderBy('fechaCreacion', 'desc').get();
+                todasLasEncuestas = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderizar(todasLasEncuestas);
+            } catch (e) {
+                document.getElementById('resultsContainer').innerHTML = `
+                    <div class="p-10 glass text-center">
+                        <i class="fa-solid fa-triangle-exclamation text-red-500 mb-3"></i>
+                        <p class="text-[10px] font-black uppercase opacity-60">Error de conexión</p>
+                    </div>`;
+            }
+        }
+
+        function renderizar(lista) {
+            const container = document.getElementById('resultsContainer');
+            const countLabel = document.getElementById('resultsCount');
+            
+            countLabel.innerText = `${lista.length} Módulos`;
+
+            if (lista.length === 0) {
+                container.innerHTML = `
+                    <div class="py-20 text-center fade-up">
+                        <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fa-solid fa-search text-3xl opacity-10"></i>
+                        </div>
+                        <h3 class="font-black uppercase text-sm tracking-widest mb-2">Sin coincidencias</h3>
+                        <p class="text-[10px] opacity-30 font-bold uppercase">Intenta con otros términos</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = lista.map((enc, index) => `
+                <div class="glass p-5 flex items-center gap-5 fade-up active:bg-white/10 transition-all border-l-4 border-l-transparent hover:border-l-orange-400" 
+                     style="animation-delay: ${index * 0.03}s"
+                     onclick="irATarea('${enc.id}')">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center text-orange-400 shadow-inner">
+                        <i class="fa-solid fa-file-signature text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-[13px] font-black uppercase tracking-tight truncate">${enc.titulo || 'Formulario Nuevo'}</h4>
+                        <div class="flex items-center gap-3 mt-1.5">
+                            <span class="text-[9px] font-black text-orange-400 uppercase tracking-tighter bg-orange-400/10 px-2 py-0.5 rounded-md">${enc.categoria || 'General'}</span>
+                            <span class="text-[9px] font-bold opacity-30 uppercase tracking-tighter">ID: ${enc.id.substring(0,6)}</span>
+                        </div>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+                        <i class="fa-solid fa-chevron-right text-[10px] opacity-30"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function irATarea(id) {
+            // Efecto de feedback antes de navegar
+            setTimeout(() => {
+                window.location.href = `responder.html?id=${id}`;
+            }, 100);
+        }
+
+        function filtrarEncuestas() {
+            const input = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearBtn');
+            const busqueda = input.value.toLowerCase();
+            
+            clearBtn.style.display = busqueda.length > 0 ? 'block' : 'none';
+
+            const filtradas = todasLasEncuestas.filter(e => 
+                (e.titulo && e.titulo.toLowerCase().includes(busqueda)) || 
+                e.id.toLowerCase().includes(busqueda)
+            );
+            renderizar(filtradas);
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            filtrarEncuestas();
+            input.focus();
+        }
+
+        function filtrarCategoria(el, cat) {
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            
+            if(cat === 'todas') {
+                renderizar(todasLasEncuestas);
+            } else {
+                const filtradas = todasLasEncuestas.filter(e => e.categoria?.toLowerCase() === cat);
+                renderizar(filtradas);
+            }
+        }
+
+        // Carga inicial
+        setTimeout(cargarEncuestas, 800);
+    </script>
+</body>
+</html>
