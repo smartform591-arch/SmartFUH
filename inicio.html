@@ -185,16 +185,7 @@ body.light-mode .nav-center-btn { border-color: #f8fafc; }
 
 <meta name="theme-color" content="#4a2c2a">
 
-<script>
-  // Registrar el Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('SW registrado', reg))
-        .catch(err => console.log('Error al registrar SW', err));
-    });
-  }
-</script>
+
 <body>
 
     <video autoplay muted loop playsinline id="videoBG">
@@ -353,5 +344,15 @@ body.light-mode .nav-center-btn { border-color: #f8fafc; }
             }
         }
     </script>
+    <script>
+  // Registrar el Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('SW registrado', reg))
+        .catch(err => console.log('Error al registrar SW', err));
+    });
+  }
+</script>
 </body>
 </html>
