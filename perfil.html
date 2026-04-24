@@ -2,27 +2,26 @@
 <html lang="es">
 <head>
     <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SmartFuh">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#4a2c2a">
 
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SmartFuh">
-<link rel="apple-touch-icon" href="icon-192.png">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('SW registrado', reg))
+            .catch(err => console.log('Error al registrar SW', err));
+        });
+      }
+    </script>
 
-<meta name="theme-color" content="#4a2c2a">
-
-<script>
-  // Registrar el Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('SW registrado', reg))
-        .catch(err => console.log('Error al registrar SW', err));
-    });
-  }
-</script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>SmartFuh | Mi Perfil</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -32,6 +31,7 @@
         body { 
             margin: 0; background: var(--brand); color: white; 
             font-family: 'Inter', sans-serif; padding-bottom: 40px;
+            opacity: 0; transition: opacity 0.5s ease;
         }
         #videoBG { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.2; z-index: -1; filter: grayscale(30%); }
         
@@ -43,7 +43,6 @@
             border-radius: 28px; 
         }
 
-        /* Notificaciones internas */
         #toast-container {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             z-index: 9999; width: 90%; max-width: 350px; pointer-events: none;
@@ -58,23 +57,16 @@
         }
         @keyframes toastIn { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Modal de Confirmación Estilizado */
         #confirm-modal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.8);
             z-index: 10000; display: none; align-items: center; justify-content: center;
             padding: 24px; backdrop-filter: blur(8px);
         }
 
-        .avatar-container {
-            position: relative;
-            display: inline-block;
-        }
+        .avatar-container { position: relative; display: inline-block; }
         .avatar-container::after {
-            content: '';
-            position: absolute; inset: -4px;
-            border: 2px solid var(--accent);
-            border-radius: 50%;
-            opacity: 0.5;
+            content: ''; position: absolute; inset: -4px;
+            border: 2px solid var(--accent); border-radius: 50%; opacity: 0.5;
         }
     </style>
 </head>
@@ -92,11 +84,11 @@
                 <i class="fa-solid fa-door-open text-2xl"></i>
             </div>
             <div>
-                <h3 class="font-black italic text-xl uppercase">¿Cerrar Sesión?</h3>
-                <p class="text-[11px] opacity-60 font-bold uppercase tracking-widest mt-1">Estas seguro de cerrar sesion?</p>
+                <h3 class="font-black italic text-xl uppercase tracking-tighter">¿Finalizar Sesión?</h3>
+                <p class="text-[10px] opacity-60 font-bold uppercase tracking-widest mt-1">Tu acceso actual será revocado</p>
             </div>
             <div class="flex gap-3">
-                <button onclick="closeLogoutModal()" class="flex-1 p-4 rounded-2xl bg-white/5 font-black text-[10px] uppercase tracking-widest">Cancelar</button>
+                <button onclick="closeLogoutModal()" class="flex-1 p-4 rounded-2xl bg-white/5 font-black text-[10px] uppercase tracking-widest">Volver</button>
                 <button onclick="confirmLogout()" class="flex-1 p-4 rounded-2xl bg-red-500 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-red-500/20">Salir</button>
             </div>
         </div>
@@ -119,7 +111,7 @@
                 </div>
             </div>
             <h2 id="p-nombre" class="text-2xl font-black mb-1 italic tracking-tight">Cargando...</h2>
-            <p id="p-rol" class="text-[11px] uppercase tracking-[0.2em] text-orange-400 font-extrabold italic">Verificando acceso...</p>
+            <p id="p-rol" class="text-[11px] uppercase tracking-[0.2em] text-orange-400 font-extrabold italic">Sincronizando...</p>
         </section>
 
         <section class="glass overflow-hidden">
@@ -186,11 +178,13 @@
             messagingSenderId: "590912576678",
             appId: "1:590912576678:web:5dd2406d46b31ada5b6867"
         };
+
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        function showMessage(text, type = 'info') {
+        // 1. Toast Notification System
+        function showMessage(text) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast`;
@@ -203,12 +197,16 @@
             }, 3000);
         }
 
+        // 2. Auth State Observer
         auth.onAuthStateChanged(async (user) => {
             if (user) {
+                document.body.style.opacity = "1"; // Mostrar la página solo si hay usuario
                 try {
                     const userDoc = await db.collection('usuarios').doc(user.uid).get();
                     if (userDoc.exists) {
                         const data = userDoc.data();
+                        
+                        // Poblar la interfaz
                         document.getElementById('p-nombre').innerText = data.nombre || "Usuario";
                         document.getElementById('p-correo').innerText = user.email;
                         document.getElementById('p-uid').innerText = user.uid;
@@ -216,18 +214,23 @@
                         document.getElementById('p-telefono').innerText = data.telefono || "No definido";
                         document.getElementById('p-direccion').innerText = data.direccion || "No registrada";
                         
+                        // Avatar inicial
                         const inicial = data.nombre ? data.nombre.charAt(0).toUpperCase() : '?';
                         document.getElementById('p-avatar').innerText = inicial;
+                    } else {
+                        showMessage("Perfil no encontrado en la base de datos");
                     }
                 } catch (error) {
+                    console.error(error);
                     showMessage("Error al sincronizar datos");
                 }
             } else {
-                window.location.href = 'login.html';
+                // Redirección inmediata al login si no hay sesión
+                window.location.href = 'index.html';
             }
         });
 
-        // Funciones del Modal de Cierre de Sesión
+        // 3. Logout Logic
         function openLogoutModal() {
             document.getElementById('confirm-modal').style.display = 'flex';
         }
@@ -238,7 +241,9 @@
 
         function confirmLogout() {
             auth.signOut().then(() => {
-                window.location.href = 'inicio.html';
+                window.location.href = 'index.html';
+            }).catch(() => {
+                showMessage("Error al cerrar sesión");
             });
         }
     </script>
