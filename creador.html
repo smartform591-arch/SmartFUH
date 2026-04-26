@@ -2,142 +2,173 @@
 <html lang="es">
 <head>
     <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SmartFuh">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#4a2c2a">
 
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SmartFuh">
-<link rel="apple-touch-icon" href="icon-192.png">
-
-<meta name="theme-color" content="#4a2c2a">
-
-<script>
-  // Registrar el Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('SW registrado', reg))
-        .catch(err => console.log('Error al registrar SW', err));
-    });
-  }
-</script>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>SmartFuh | Creador</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>SmartFuh | Creador Pro Elite</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
     <style>
-        :root { --brand: #4a2c2a; --accent: #e89c2c; }
+        :root { --brand: #1a0f0e; --accent: #e89c2c; }
         body { 
             margin: 0; background: var(--brand); color: white; 
-            font-family: 'Inter', sans-serif; padding-bottom: 120px; 
+            font-family: 'Inter', sans-serif; padding-bottom: 140px; 
+            overflow-x: hidden; scroll-behavior: smooth;
         }
-       
-       #bg-image {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('fondo de login.jpeg'); /* Tu imagen */
-    background-size: cover;
-    background-position: center;
-    filter: brightness(0.4) contrast(1.1); /* Oscurece un poco la imagen para que el texto sea legible */
-    z-index: -1;
-}
+        
+        #bg-image {
+            position: fixed; inset: 0; width: 100%; height: 100%;
+            background-image: url('fondo de login.jpeg'); 
+            background-size: cover; background-position: center;
+            filter: brightness(0.25) contrast(1.2); z-index: -1;
+        }
         
         .glass { 
-            background: rgba(255, 255, 255, 0.08); 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.12); 
-            border-radius: 28px; 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(20px) saturate(180%); 
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 32px; 
         }
         
         .input-pro { 
-            width: 100%; background: rgba(255,255,255,0.05); 
-            border: 1.5px solid rgba(255,255,255,0.1); 
-            border-radius: 18px; padding: 15px; color: white; 
-            outline: none; transition: 0.3s; font-size: 14px;
+            width: 100%; background: rgba(0,0,0,0.3); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 20px; padding: 16px; color: white; 
+            outline: none; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-size: 14px;
         }
-        .input-pro:focus { border-color: var(--accent); background: rgba(255,255,255,0.1); }
+        .input-pro:focus { border-color: var(--accent); background: rgba(232, 156, 44, 0.05); transform: translateY(-2px); }
 
         .btn-add { 
-            background: rgba(255,255,255,0.1); color: var(--accent); 
-            font-weight: 800; padding: 18px; border-radius: 20px; 
-            width: 100%; text-transform: uppercase; border: 2px dashed var(--accent);
-            transition: 0.3s;
+            background: rgba(232, 156, 44, 0.03); color: var(--accent); 
+            font-weight: 800; padding: 22px; border-radius: 24px; 
+            width: 100%; text-transform: uppercase; border: 2px dashed rgba(232, 156, 44, 0.2);
+            transition: 0.3s; font-size: 11px; letter-spacing: 2px;
         }
-        .btn-add:active { transform: scale(0.95); background: rgba(232, 156, 44, 0.1); }
+        .btn-add:active { transform: scale(0.98); background: rgba(232, 156, 44, 0.1); }
 
         .btn-save { 
-            background: var(--accent); color: var(--brand); 
-            font-weight: 900; padding: 20px; border-radius: 24px; 
-            width: 85%; position: fixed; bottom: 30px; left: 50%; 
-            transform: translateX(-50%); max-width: 400px; z-index: 100; 
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5); text-transform: uppercase;
+            background: var(--accent); color: #1a0f0e; 
+            font-weight: 900; padding: 22px; border-radius: 28px; 
+            width: 90%; max-width: 400px; text-transform: uppercase;
+            box-shadow: 0 15px 35px rgba(232, 156, 44, 0.2);
+            transition: 0.4s; letter-spacing: 1px;
+        }
+        .btn-save:disabled { filter: grayscale(1); opacity: 0.5; }
+
+        /* Custom Toast */
+        #toast-container { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 85%; }
+        .toast { 
+            background: rgba(20, 10, 8, 0.9); backdrop-filter: blur(15px); 
+            padding: 18px 25px; border-radius: 24px; margin-bottom: 12px; 
+            display: flex; align-items: center; gap: 15px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            animation: toastIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards; 
+        }
+        @keyframes toastIn { from { transform: translateY(-100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Modal Base */
+        .modal-overlay { 
+            display: none; position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.85); z-index: 10000; 
+            align-items: center; justify-content: center; 
+            padding: 25px; backdrop-filter: blur(12px); 
         }
         
-        /* Notificaciones internas (Toast) */
-        #toast-container {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 9999; width: 90%; max-width: 350px; pointer-events: none;
-        }
-        .toast {
-            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white; padding: 16px 20px; border-radius: 20px;
-            margin-bottom: 10px; display: flex; align-items: center; gap: 12px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            animation: toastIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        @keyframes toastIn { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
-        .toast.error { border-left: 5px solid #ef4444; }
-        .toast.success { border-left: 5px solid #22c55e; }
+        .pregunta-card { animation: cardIn 0.5s ease-out forwards; }
+        @keyframes cardIn { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        .pregunta-card { animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        select option { background: var(--brand); color: white; }
+        .btn-delete-opt { color: #ef4444; padding: 5px; opacity: 0.6; transition: 0.3s; }
+        .btn-delete-opt:hover { opacity: 1; transform: scale(1.1); }
     </style>
 </head>
 <body>
 
     <div id="bg-image"></div>
-
     <div id="toast-container"></div>
 
+    <div id="modal-exit" class="modal-overlay">
+        <div class="glass p-8 w-full max-w-sm text-center">
+            <div class="w-16 h-16 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-door-open text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-black mb-2 italic">¿ABANDONAR EDITOR?</h2>
+            <p class="text-xs opacity-60 mb-8 leading-relaxed">Si sales ahora, todos los cambios en esta encuesta se perderán permanentemente.</p>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="closeModal('modal-exit')" class="py-4 bg-white/5 rounded-2xl font-bold text-[10px] uppercase">Continuar</button>
+                <button onclick="window.location.href='inicio.html'" class="py-4 bg-red-500 text-white rounded-2xl font-bold text-[10px] uppercase">Salir</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="qr-modal" class="modal-overlay">
+        <div class="glass p-8 w-full max-w-sm text-center">
+            <div class="flex justify-center mb-4">
+                <div class="px-4 py-1 bg-green-500/20 text-green-400 rounded-full text-[9px] font-black tracking-widest uppercase">Publicado con Éxito</div>
+            </div>
+            <h2 class="text-2xl font-black italic mb-2 tracking-tighter">SISTEMA LISTO</h2>
+            <div id="qrcode" class="flex justify-center shadow-2xl"></div>
+            <p id="survey-url" class="text-[10px] opacity-40 break-all my-6 px-4 font-medium"></p>
+            <div class="space-y-3">
+                <button onclick="copyURL()" class="w-full py-4 bg-white/10 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-transform">Copiar Enlace</button>
+                <button onclick="window.location.href='inicio.html'" class="w-full py-4 bg-orange-400 text-black rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-orange-500/20">Finalizar</button>
+            </div>
+        </div>
+    </div>
+
     <header class="p-8 pt-12 flex items-center justify-between">
-        <button onclick="window.location.href='inicio.html'" class="w-12 h-12 glass flex items-center justify-center">
-            <i class="fa-solid fa-chevron-left"></i>
+        <button onclick="openModal('modal-exit')" class="w-12 h-12 glass flex items-center justify-center active:scale-90 transition-transform">
+            <i class="fa-solid fa-arrow-left text-sm"></i>
         </button>
         <div class="text-right">
-            <h1 class="text-xl font-black italic tracking-tighter">CREADOR</h1>
-            <p class="text-[9px] uppercase font-black text-orange-400 tracking-[0.2em]">SmartFuh Studio</p>
+            <div class="flex items-center justify-end gap-2 mb-1">
+                <span class="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></span>
+                <p class="text-[9px] uppercase font-black text-orange-400 tracking-[0.2em]">Studio Mode</p>
+            </div>
+            <h1 class="text-xl font-black italic tracking-tighter leading-none uppercase">Creador Elite</h1>
         </div>
     </header>
 
-    <main class="px-6 space-y-6 pb-20">
-        <section class="glass p-6 space-y-4">
-            <p class="text-[10px] font-black text-orange-400 uppercase tracking-widest">General</p>
-            <input type="text" id="survey-title" class="input-pro font-bold" placeholder="Título de la Encuesta">
-            <textarea id="survey-desc" class="input-pro h-24" placeholder="Breve descripción para los usuarios..."></textarea>
+    <main class="px-6 space-y-6">
+        <section class="glass p-7 space-y-5 border-t border-white/10">
+            <div>
+                <p class="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-3">Identidad del Módulo</p>
+                <input type="text" id="survey-title" class="input-pro font-black italic text-lg" placeholder="NOMBRE DE LA ENCUESTA">
+            </div>
+            <textarea id="survey-desc" class="input-pro h-24 text-sm opacity-80" placeholder="Escribe aquí las instrucciones para el equipo..."></textarea>
         </section>
 
-        <div id="preguntas-container" class="space-y-6"></div>
+        <div id="preguntas-container" class="space-y-6">
+            </div>
 
         <button onclick="agregarPregunta()" class="btn-add">
-            <i class="fa-solid fa-plus-circle mr-2"></i> Nueva Pregunta
+            <i class="fa-solid fa-plus-circle mr-3 text-lg"></i> Expandir Formulario
         </button>
     </main>
 
-    <button onclick="guardarEncuesta()" class="btn-save" id="btn-publicar">
-        <i class="fa-solid fa-rocket mr-2"></i> Publicar Ahora
-    </button>
+    <div class="fixed bottom-10 left-0 w-full flex justify-center px-6 z-50">
+        <button onclick="guardarEncuesta()" class="btn-save flex items-center justify-center gap-3" id="btn-publicar">
+            <i class="fa-solid fa-bolt-lightning text-sm"></i>
+            <span>Publicar Módulo</span>
+        </button>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
     <script>
+        // Configuración de Firebase (Tu misma config)
         const firebaseConfig = {
             apiKey: "AIzaSyCBiiY9GSlF-7r3wjBwcLCq5jyxKVOjAAE",
             authDomain: "smartform-ee4bb.firebaseapp.com",
@@ -150,57 +181,79 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // Función para mostrar mensajes dentro del sistema
+        // Control de Modales
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // Mensajería Toast Pro
         function showMessage(text, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            const icon = type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-circle-exclamation' : 'fa-info-circle');
-            
-            toast.innerHTML = `
-                <i class="fa-solid ${icon}"></i>
-                <span class="text-xs font-bold uppercase tracking-tight">${text}</span>
-            `;
+            const icon = type === 'error' ? 'fa-triangle-exclamation text-red-400' : 'fa-circle-check text-green-400';
+            toast.className = `toast`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i><span class="text-[11px] font-black uppercase tracking-wide">${text}</span>`;
             container.appendChild(toast);
-            
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateY(-20px)';
-                setTimeout(() => toast.remove(), 500);
+                setTimeout(() => toast.remove(), 400);
             }, 3000);
         }
 
         let preguntasCount = 0;
+        let lastGeneratedURL = "";
 
         function agregarPregunta() {
             preguntasCount++;
             const div = document.createElement('div');
-            div.className = 'glass p-6 pregunta-card space-y-4';
+            div.className = 'glass p-7 space-y-5 relative pregunta-card';
             div.id = `pregunta-${preguntasCount}`;
             div.innerHTML = `
                 <div class="flex justify-between items-center">
-                    <span class="text-[10px] font-black bg-orange-400 text-[#4a2c2a] px-3 py-1 rounded-full uppercase">Pregunta ${preguntasCount}</span>
-                    <button onclick="eliminarPregunta(${preguntasCount})" class="text-red-400 w-8 h-8 glass flex items-center justify-center">
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 h-6 rounded-lg bg-orange-400 text-black flex items-center justify-center text-[10px] font-black">${preguntasCount}</span>
+                        <p class="text-[10px] font-black uppercase opacity-40 tracking-widest">Pregunta</p>
+                    </div>
+                    <button onclick="eliminarPregunta(${preguntasCount})" class="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center active:scale-90 transition-transform">
                         <i class="fa-solid fa-trash-can text-xs"></i>
                     </button>
                 </div>
-                <input type="text" class="input-pro q-text font-bold" placeholder="¿Qué quieres preguntar?">
-                <select class="input-pro q-type w-full" onchange="toggleOpciones(${preguntasCount}, this.value)">
-                    <option value="texto">Texto Libre</option>
-                    <option value="opciones">Selección</option>
-                </select>
-                <div id="opciones-box-${preguntasCount}" class="hidden space-y-3 bg-white/5 p-4 rounded-2xl border border-white/10">
-                    <div id="list-opts-${preguntasCount}" class="space-y-2">
-                        <input type="text" class="input-pro text-xs q-opt" placeholder="Opción 1">
-                        <input type="text" class="input-pro text-xs q-opt" placeholder="Opción 2">
+                
+                <input type="text" class="input-pro font-bold" placeholder="¿Qué quieres preguntar?">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <p class="text-[8px] font-black uppercase opacity-40 ml-2">Formato</p>
+                        <select class="input-pro q-type text-[10px] font-bold uppercase" onchange="toggleOpciones(${preguntasCount}, this.value)">
+                            <option value="texto">Texto</option>
+                            <option value="opciones">Opciones</option>
+                            <option value="numero">Número</option>
+                        </select>
                     </div>
-                    <button onclick="añadirOpcionInput(${preguntasCount})" class="text-[10px] font-bold text-orange-400 uppercase">
-                        <i class="fa-solid fa-plus mr-1"></i> Añadir otra opción
+                    <div class="space-y-2">
+                        <p class="text-[8px] font-black uppercase opacity-40 ml-2">Iconografía</p>
+                        <select class="input-pro q-icon text-[10px] font-bold uppercase">
+                            <option value="fa-file-lines">Doc</option>
+                            <option value="fa-camera">Foto</option>
+                            <option value="fa-bolt">Quick</option>
+                            <option value="fa-triangle-exclamation">Alerta</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="opciones-box-${preguntasCount}" class="hidden space-y-4 p-5 bg-black/40 rounded-3xl border border-white/5 shadow-inner">
+                    <div id="list-opts-${preguntasCount}" class="space-y-3">
+                        <div class="flex gap-3 items-center">
+                            <input type="text" class="input-pro text-xs q-opt" placeholder="Opción A">
+                        </div>
+                    </div>
+                    <button onclick="añadirOpcionInput(${preguntasCount})" class="w-full py-3 bg-white/5 rounded-xl text-[9px] font-black text-orange-400 uppercase tracking-tighter hover:bg-white/10 transition-colors">
+                        + Nueva Opción
                     </button>
                 </div>
             `;
             document.getElementById('preguntas-container').appendChild(div);
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            div.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         function toggleOpciones(id, val) {
@@ -210,17 +263,19 @@
 
         function añadirOpcionInput(id) {
             const container = document.getElementById(`list-opts-${id}`);
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.className = 'input-pro text-xs q-opt';
-            input.placeholder = `Nueva Opción`;
-            container.appendChild(input);
+            const div = document.createElement('div');
+            div.className = "flex gap-3 items-center animate-cardIn";
+            div.innerHTML = `
+                <input type="text" class="input-pro text-xs q-opt" placeholder="Siguiente Opción">
+                <button onclick="this.parentElement.remove()" class="btn-delete-opt"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            container.appendChild(div);
         }
 
         function eliminarPregunta(id) {
             const el = document.getElementById(`pregunta-${id}`);
-            el.style.transform = "translateX(100px)";
-            el.style.opacity = "0";
+            el.style.transform = 'scale(0.8)';
+            el.style.opacity = '0';
             setTimeout(() => el.remove(), 300);
         }
 
@@ -228,53 +283,66 @@
             const titulo = document.getElementById('survey-title').value.trim();
             const desc = document.getElementById('survey-desc').value.trim();
             const btn = document.getElementById('btn-publicar');
-            
-            if(!titulo) return showMessage("Falta el título", "error");
+            const preguntasCards = document.querySelectorAll('#preguntas-container > div');
 
-            const cards = document.querySelectorAll('.pregunta-card');
-            const listaPreguntas = [];
+            if (!titulo) return showMessage("Escribe un título para el módulo", "error");
+            if (preguntasCards.length === 0) return showMessage("Agrega al menos una pregunta", "error");
 
-            cards.forEach(card => {
-                const texto = card.querySelector('.q-text')?.value.trim();
-                if(!texto) return;
-
-                const tipo = card.querySelector('.q-type').value;
-                let opciones = [];
-                
-                if(tipo === 'opciones') {
-                    const opts = card.querySelectorAll('.q-opt');
-                    opts.forEach(o => { if(o.value.trim()) opciones.push(o.value.trim()); });
-                }
-                listaPreguntas.push({ texto, tipo, opciones });
-            });
-
-            if(listaPreguntas.length === 0) return showMessage("Agrega al menos una pregunta", "error");
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-sync fa-spin"></i> SINCRONIZANDO...`;
 
             try {
-                btn.disabled = true;
-                btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-2"></i> PUBLICANDO...`;
-                
-                const user = auth.currentUser;
-                await db.collection('encuestas').add({
-                    titulo: titulo,
-                    descripcion: desc,
-                    preguntas: listaPreguntas,
-                    creadoPor: user ? user.uid : 'admin_manual',
-                    creadoPorNombre: user ? (user.displayName || user.email) : 'Admin',
-                    fecha: new Date(),
-                    totalPreguntas: listaPreguntas.length
+                const listaPreguntas = [];
+                preguntasCards.forEach(card => {
+                    const inputs = card.querySelectorAll('input');
+                    const texto = inputs[0].value.trim();
+                    const tipo = card.querySelector('.q-type').value;
+                    const icono = card.querySelector('.q-icon').value;
+                    let opciones = [];
+                    
+                    if (tipo === 'opciones') {
+                        card.querySelectorAll('.q-opt').forEach(o => { if(o.value) opciones.push(o.value); });
+                    }
+                    if (texto) listaPreguntas.push({ texto, tipo, icono, opciones });
                 });
 
-                showMessage("¡Publicado con éxito!", "success");
-                setTimeout(() => window.location.href = 'inicio.html', 1500);
+                const res = await db.collection('encuestas').add({
+                    titulo, descripcion: desc, preguntas: listaPreguntas,
+                    fecha: new Date(), creadoPor: auth.currentUser.uid,
+                    status: 'active'
+                });
+
+                const shareURL = `${window.location.origin}/responder.html?id=${res.id}`;
+                lastGeneratedURL = shareURL;
                 
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), {
+                    text: shareURL, width: 220, height: 220,
+                    colorDark : "#000000", colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+
+                document.getElementById('survey-url').innerText = shareURL;
+                openModal('qr-modal');
+
             } catch (e) {
-                showMessage("Error al subir", "error");
+                showMessage("Fallo en la conexión con la base", "error");
                 btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-rocket mr-2"></i> Publicar Ahora`;
+                btn.innerHTML = `<i class="fa-solid fa-bolt-lightning text-sm"></i><span>Publicar Módulo</span>`;
             }
         }
 
+        function copyURL() {
+            navigator.clipboard.writeText(lastGeneratedURL);
+            showMessage("URL copiada con éxito", "success");
+        }
+
+        // Bloquear salida accidental
+        window.onbeforeunload = function() {
+            return "¿Tienes cambios sin guardar?";
+        };
+
+        // Iniciar con la primera pregunta
         agregarPregunta();
     </script>
 </body>
