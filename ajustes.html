@@ -27,7 +27,17 @@
             padding-bottom: 120px; transition: all 0.5s ease; overflow-x: hidden;
         }
 
-        #videoBG { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.12; z-index: -1; }
+       #bg-image {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('fondo de login.jpeg'); /* Tu imagen */
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.4) contrast(1.1); /* Oscurece un poco la imagen para que el texto sea legible */
+    z-index: -1;
+}
 
         .glass { 
             background: var(--glass); backdrop-filter: blur(30px); 
@@ -66,9 +76,7 @@
 </head>
 <body class="font-modern">
 
-    <video autoplay muted loop playsinline id="videoBG">
-        <source src="12345.mp4" type="video/mp4">
-    </video>
+    <div id="bg-image"></div>
 
     <a href="inicio.html" class="home-btn">
         <i class="fa-solid fa-house"></i>
@@ -192,7 +200,7 @@
         const db = firebase.firestore();
 
         // RECUERDA CAMBIAR ESTE CORREO POR EL TUYO
-        const ADMIN_EMAIL = "tu-correo@gmail.com";
+        const ADMIN_EMAIL = "madridleyvajosediego@gmail.com";
 
         // DICCIONARIO MULTILENGUAJE
         const translations = {
