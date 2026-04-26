@@ -3,67 +3,58 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-    <title>SmartFuh | Responder Elite</title>
+    <title>SmartFuh | Terminal de Respuesta</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;800&family=Playfair+Display:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;800&display=swap" rel="stylesheet">
 
     <style>
         :root { --brand: #1a0f0e; --accent: #e89c2c; --border: rgba(255, 255, 255, 0.08); }
         
-        /* Tipografías */
         .font-modern { font-family: 'Inter', sans-serif; }
         .font-tech { font-family: 'JetBrains Mono', monospace; }
-        .font-elegant { font-family: 'Playfair Display', serif; }
 
         body { 
             margin: 0; background: var(--brand); color: white; 
-            padding-bottom: 150px; scroll-behavior: smooth; transition: all 0.5s ease;
+            padding-bottom: 150px; scroll-behavior: smooth; 
+            overflow-x: hidden; -webkit-tap-highlight-color: transparent;
         }
 
-       #bg-image {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('fondo de login.jpeg'); /* Tu imagen */
-    background-size: cover;
-    background-position: center;
-    filter: brightness(0.4) contrast(1.1); /* Oscurece un poco la imagen para que el texto sea legible */
-    z-index: -1;
-}
+        #bg-image {
+            position: fixed; inset: 0; width: 100%; height: 100%;
+            background-image: url('fondo de login.jpeg'); 
+            background-size: cover; background-position: center;
+            filter: brightness(0.3) contrast(1.1); z-index: -1;
+        }
         
         .glass { 
-            background: rgba(255, 255, 255, 0.04); 
+            background: rgba(255, 255, 255, 0.03); 
             backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--border); border-radius: 32px; 
         }
 
-        /* Botón Flotante Inicio */
         .home-btn {
             position: fixed; bottom: 120px; right: 25px; width: 55px; height: 55px;
-            background: var(--accent); color: var(--brand); border-radius: 18px;
+            background: var(--accent); color: var(--brand); border-radius: 20px;
             display: flex; items-center; justify-content: center; font-size: 20px;
             box-shadow: 0 10px 30px rgba(232, 156, 44, 0.3); z-index: 999;
             transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .home-btn:active { transform: scale(0.9) rotate(-10deg); }
 
-        /* Preguntas */
-        .question-card { transition: 0.4s; }
-        .question-card:focus-within { 
-            background: rgba(255,255,255,0.08); 
-            border-color: var(--accent);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
+        /* Animaciones */
+        .fade-in { animation: fadeIn 0.6s ease forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .question-card { transition: all 0.4s ease; }
+        .question-card:focus-within { background: rgba(255,255,255,0.06); border-color: var(--accent); }
 
         .input-text { 
-            width: 100%; background: rgba(0,0,0,0.3); 
+            width: 100%; background: rgba(0,0,0,0.4); 
             border: 1.5px solid var(--border); 
-            border-radius: 20px; padding: 20px; color: white; 
+            border-radius: 22px; padding: 22px; color: white; 
             outline: none; transition: 0.3s; font-weight: 600;
         }
-        .input-text:focus { border-color: var(--accent); background: rgba(0,0,0,0.5); }
+        .input-text:focus { border-color: var(--accent); background: rgba(0,0,0,0.6); }
 
         .option-card {
             background: rgba(255, 255, 255, 0.03);
@@ -76,18 +67,19 @@
 
         .progress-bar-fill {
             height: 100%; background: var(--accent);
-            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 0 20px var(--accent);
         }
 
         .btn-submit {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 450px; background: var(--accent); color: var(--brand);
-            font-weight: 900; padding: 22px; border-radius: 25px; 
+            width: 92%; max-width: 450px; background: var(--accent); color: var(--brand);
+            font-weight: 900; padding: 22px; border-radius: 26px; 
             text-transform: uppercase; letter-spacing: 2px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4); z-index: 100;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5); z-index: 100;
+            transition: 0.3s;
         }
-        .btn-submit:disabled { opacity: 0.2; transform: translateX(-50%) scale(0.98); }
+        .btn-submit:disabled { opacity: 0.15; transform: translateX(-50%) scale(0.95); }
 
         #success-screen {
             position: fixed; inset: 0; background: var(--brand); z-index: 2000;
@@ -99,48 +91,47 @@
 
     <div id="bg-image"></div>
 
-    <a href="inicio.html" class="home-btn" onclick="return confirm('¿Volver al inicio? Se perderá el progreso actual.')">
+    <a href="inicio.html" class="home-btn" onclick="return confirm('¿Volver al inicio? Se perderá el progreso no guardado.')">
         <i class="fa-solid fa-house"></i>
     </a>
 
-    <div id="toast-container" class="fixed top-10 left-1/2 -translate-x-1/2 z-[3000] w-[90%] pointer-events-none"></div>
-
     <div id="success-screen" class="p-10 text-center">
-        <div class="w-24 h-24 bg-orange-400 rounded-3xl flex items-center justify-center mb-8 rotate-12 shadow-2xl mx-auto">
-            <i class="fa-solid fa-paper-plane text-4xl text-black"></i>
+        <div class="w-24 h-24 bg-orange-400 rounded-[32px] flex items-center justify-center mb-8 rotate-12 shadow-2xl mx-auto">
+            <i class="fa-solid fa-check text-4xl text-black"></i>
         </div>
-        <h2 class="text-4xl font-black italic tracking-tighter mb-4">DATOS ENVIADOS</h2>
-        <p class="opacity-40 text-[10px] uppercase font-bold tracking-[0.3em] mb-12">La terminal ha recibido tu reporte.</p>
-        <button onclick="window.location.href='inicio.html'" class="w-full max-w-xs py-5 glass font-black uppercase text-[11px] tracking-widest">Finalizar Sesión</button>
+        <h2 class="text-4xl font-black italic tracking-tighter mb-4 uppercase">Transmisión Exitosa</h2>
+        <p class="opacity-40 text-[10px] uppercase font-black tracking-[0.3em] mb-12">Reporte sincronizado con la base de datos.</p>
+        <button onclick="window.location.href='inicio.html'" class="w-full max-w-xs py-5 glass font-black uppercase text-[11px] tracking-widest text-orange-400">Volver al Panel</button>
     </div>
 
-    <header class="p-8 pt-16">
-        <div class="flex justify-between items-start mb-8">
+    <header class="p-8 pt-16 sticky top-0 z-50 bg-gradient-to-b from-[#1a0f0e] to-transparent">
+        <div class="flex justify-between items-end mb-6">
             <div class="space-y-1">
-                <h1 id="survey-title" class="text-3xl font-black italic tracking-tighter uppercase leading-none">Cargando...</h1>
-                <p id="timer" class="text-[9px] font-black text-orange-400 uppercase tracking-widest opacity-60">Iniciando cronómetro...</p>
+                <h1 id="survey-title" class="text-2xl font-black italic tracking-tighter uppercase leading-none">Cargando Encuesta...</h1>
+                <p id="timer" class="text-[9px] font-black text-orange-400 uppercase tracking-widest">CRONÓMETRO: 00:00</p>
             </div>
             <div class="text-right">
-                <span id="progress-text" class="text-2xl font-black italic text-orange-400">0%</span>
+                <span id="progress-text" class="text-2xl font-tech font-black text-orange-400">0%</span>
             </div>
         </div>
-        
-        <div class="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+        <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
             <div id="progress-bar" class="progress-bar-fill" style="width: 0%"></div>
         </div>
     </header>
 
-    <main id="questions-container" class="px-6 space-y-8">
+    <main id="questions-container" class="px-6 space-y-6">
         <div class="glass p-10 space-y-6 animate-pulse">
-            <div class="w-20 h-4 bg-white/10 rounded-full"></div>
-            <div class="w-full h-10 bg-white/10 rounded-xl"></div>
+            <div class="w-24 h-4 bg-white/10 rounded-full"></div>
+            <div class="w-full h-8 bg-white/10 rounded-xl"></div>
             <div class="w-full h-20 bg-white/10 rounded-3xl"></div>
         </div>
     </main>
 
     <button onclick="enviarRespuestas()" class="btn-submit" id="btn-enviar" style="display: none;" disabled>
-        Enviar Reporte Final
+        Finalizar Reporte
     </button>
+
+    <div id="toast-container" class="fixed top-10 left-1/2 -translate-x-1/2 z-[3000] w-[80%] pointer-events-none"></div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -165,25 +156,19 @@
         let totalPreguntas = 0;
         let formularioIniciado = false;
         let startTime = Date.now();
-
-        // Aplicar Preferencias Guardadas
-        function applyStyles() {
-            const font = localStorage.getItem('fuh_font') || 'font-modern';
-            const accent = localStorage.getItem('fuh_accent') || '#e89c2c';
-            document.body.className = font;
-            document.documentElement.style.setProperty('--accent', accent);
-        }
+        
+        // Carga de borrador
+        let respuestasGuardadas = JSON.parse(localStorage.getItem(`draft_${surveyId}`)) || {};
 
         function showToast(text) {
-            const container = document.getElementById('toast-container');
             const t = document.createElement('div');
-            t.className = 'glass p-5 mb-3 text-[10px] font-black uppercase tracking-widest text-center border-orange-400/30';
+            t.className = 'glass p-4 mb-3 text-[9px] font-black uppercase tracking-widest text-center border-orange-400/40 fade-in text-orange-400';
             t.innerText = text;
-            container.appendChild(t);
+            document.getElementById('toast-container').appendChild(t);
             setTimeout(() => t.remove(), 3000);
         }
 
-        // Cronómetro
+        // Cronómetro mejorado
         setInterval(() => {
             const diff = Math.floor((Date.now() - startTime) / 1000);
             const m = Math.floor(diff / 60).toString().padStart(2, '0');
@@ -200,9 +185,12 @@
                 surveyData = doc.data();
                 totalPreguntas = surveyData.preguntas.length;
                 document.getElementById('survey-title').innerText = surveyData.titulo;
+                
                 renderizarPreguntas(surveyData.preguntas);
                 document.getElementById('btn-enviar').style.display = 'block';
-            } catch (e) { showToast("ERROR DE RED"); }
+                
+                recuperarBorrador();
+            } catch (e) { showToast("ERROR DE CONEXIÓN CON EL SERVIDOR"); }
         }
 
         function renderizarPreguntas(preguntas) {
@@ -210,23 +198,25 @@
             container.innerHTML = '';
             preguntas.forEach((p, index) => {
                 const div = document.createElement('div');
-                div.className = 'glass p-8 space-y-6 question-card';
+                div.className = 'glass p-8 space-y-6 question-card fade-in';
+                div.style.animationDelay = `${index * 0.1}s`;
                 
                 let inputHTML = p.tipo === 'texto' ? 
-                    `<input type="text" class="input-text resp-input" data-pregunta="${p.texto}" placeholder="Escribe tu respuesta..." oninput="actualizarProgreso()">` :
-                    `<div class="grid grid-cols-1 gap-3">${p.opciones.map(opt => `
-                        <div class="option-card" onclick="seleccionarOpcion(this, '${p.texto}', '${opt}')">
-                            <div class="w-5 h-5 rounded-full border-2 border-white/20 flex items-center justify-center">
-                                <div class="w-2.5 h-2.5 rounded-full bg-black opacity-0"></div>
-                            </div>
-                            <span class="text-[13px] uppercase font-black tracking-tight">${opt}</span>
-                        </div>`).join('')}
+                    `<input type="text" class="input-text resp-input" data-pregunta="${p.texto}" placeholder="Ingrese respuesta..." oninput="manejarEntradaTexto(this)">` :
+                    `<div class="grid grid-cols-1 gap-3" data-group="${p.texto}">
+                        ${p.opciones.map(opt => `
+                            <div class="option-card" onclick="seleccionarOpcion(this, '${p.texto}', '${opt}')" data-value="${opt}">
+                                <div class="w-5 h-5 rounded-full border-2 border-white/20 flex items-center justify-center">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-black opacity-0"></div>
+                                </div>
+                                <span class="text-[13px] uppercase font-black tracking-tight">${opt}</span>
+                            </div>`).join('')}
                         <input type="hidden" class="resp-input" data-pregunta="${p.texto}">
                     </div>`;
 
                 div.innerHTML = `
                     <div class="flex items-center justify-between">
-                        <span class="text-[9px] font-black bg-white/10 px-3 py-1 rounded-full uppercase tracking-widest opacity-60">Módulo ${index + 1}</span>
+                        <span class="text-[9px] font-black bg-white/5 px-3 py-1 rounded-full uppercase tracking-widest opacity-40">Módulo ${index + 1}</span>
                         <i class="fa-solid fa-circle-check text-orange-400 opacity-0 transition-all check-icon"></i>
                     </div>
                     <h3 class="text-xl font-black italic tracking-tighter leading-tight uppercase">${p.texto}</h3>
@@ -235,8 +225,25 @@
             });
         }
 
-        function seleccionarOpcion(el, pregunta, valor) {
+        function manejarEntradaTexto(input) {
             formularioIniciado = true;
+            const pregunta = input.getAttribute('data-pregunta');
+            respuestasGuardadas[pregunta] = input.value;
+            localStorage.setItem(`draft_${surveyId}`, JSON.stringify(respuestasGuardadas));
+            
+            const card = input.closest('.question-card');
+            if(input.value.trim().length > 0) {
+                card.querySelector('.check-icon').classList.replace('opacity-0', 'opacity-100');
+            } else {
+                card.querySelector('.check-icon').classList.replace('opacity-100', 'opacity-0');
+            }
+            actualizarProgreso();
+        }
+
+        function seleccionarOpcion(el, pregunta, valor, conScroll = true) {
+            if (window.navigator.vibrate) window.navigator.vibrate(10);
+            formularioIniciado = true;
+            
             const parent = el.parentElement;
             parent.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
             el.classList.add('selected');
@@ -244,18 +251,38 @@
             const inputHidden = parent.querySelector('input[type="hidden"]');
             inputHidden.value = valor;
             
-            // Marcar como completado visualmente
+            // Guardar en borrador
+            respuestasGuardadas[pregunta] = valor;
+            localStorage.setItem(`draft_${surveyId}`, JSON.stringify(respuestasGuardadas));
+
             el.closest('.question-card').querySelector('.check-icon').classList.replace('opacity-0', 'opacity-100');
-            
             actualizarProgreso();
             
-            // Auto-scroll
-            const next = el.closest('.question-card').nextElementSibling;
-            if (next) setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400);
+            if (conScroll) {
+                const next = el.closest('.question-card').nextElementSibling;
+                if (next) setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+            }
+        }
+
+        function recuperarBorrador() {
+            const inputs = document.querySelectorAll('.resp-input');
+            inputs.forEach(input => {
+                const preg = input.getAttribute('data-pregunta');
+                if (respuestasGuardadas[preg]) {
+                    if (input.type === 'hidden') {
+                        const val = respuestasGuardadas[preg];
+                        input.value = val;
+                        const option = input.closest('.question-card').querySelector(`.option-card[data-value="${val}"]`);
+                        if(option) seleccionarOpcion(option, preg, val, false);
+                    } else {
+                        input.value = respuestasGuardadas[preg];
+                        manejarEntradaTexto(input);
+                    }
+                }
+            });
         }
 
         function actualizarProgreso() {
-            formularioIniciado = true;
             const inputs = document.querySelectorAll('.resp-input');
             let respondidas = 0;
             inputs.forEach(i => { if(i.value.trim() !== '') respondidas++; });
@@ -269,42 +296,40 @@
         async function enviarRespuestas() {
             const btn = document.getElementById('btn-enviar');
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-sync animate-spin mr-3"></i> TRANSMITIENDO...`;
+            btn.innerHTML = `<i class="fa-solid fa-tower-broadcast animate-pulse mr-3"></i> TRANSMITIENDO...`;
 
             try {
                 const user = auth.currentUser;
-                const respuestasDetalladas = {};
+                const rDetalladas = {};
                 document.querySelectorAll('.resp-input').forEach(i => {
-                    respuestasDetalladas[i.getAttribute('data-pregunta')] = i.value;
+                    rDetalladas[i.getAttribute('data-pregunta')] = i.value;
                 });
 
                 await db.collection('respuestas').add({
                     encuestaId: surveyId,
                     tituloEncuesta: surveyData.titulo,
-                    usuarioEmail: user ? user.email : 'Anonimo',
-                    respuestas: respuestasDetalladas,
+                    usuarioEmail: user ? user.email : 'Operador Externo',
+                    usuarioNombre: user ? user.displayName : 'Anónimo',
+                    respuestas: rDetalladas,
                     duracion: document.getElementById('timer').innerText,
                     fecha: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
+                localStorage.removeItem(`draft_${surveyId}`);
                 formularioIniciado = false;
                 document.getElementById('success-screen').style.display = 'flex';
                 window.scrollTo(0,0);
             } catch (e) {
-                showToast("FALLO EN LA TRANSMISIÓN");
+                showToast("ERROR CRÍTICO AL ENVIAR REPORTE");
                 btn.disabled = false;
                 btn.innerText = "REINTENTAR ENVÍO";
             }
         }
 
         window.onbeforeunload = (e) => {
-            if (formularioIniciado) {
-                e.preventDefault();
-                return "Tienes cambios sin guardar.";
-            }
+            if (formularioIniciado) return "Existen cambios no sincronizados.";
         };
 
-        applyStyles();
         cargarEncuesta();
     </script>
 </body>
