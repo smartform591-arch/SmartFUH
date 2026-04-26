@@ -10,73 +10,79 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-    <title>SmartFuh | Dashboard</title>
+    <title>SmartFuh | Dashboard Elite</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     
     <style>
-        :root { --brand: #4a2c2a; --accent: #e89c2c; }
+        :root { --brand: #1a0f0e; --accent: #e89c2c; }
         body { 
             margin: 0; background: var(--brand); color: white; 
             font-family: 'Inter', sans-serif; padding-bottom: 120px; 
             overflow-x: hidden; user-select: none;
         }
-        #bg-image {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('fondo de inicio.jpeg'); /* Tu imagen */
-    background-size: cover;
-    background-position: center;
-    filter: brightness(0.4) contrast(1.1); /* Oscurece un poco la imagen para que el texto sea legible */
-    z-index: -1;
-}
-
         
+        #bg-image {
+            position: fixed; inset: 0; width: 100%; height: 100%;
+            background-image: url('fondo de inicio.jpeg'); 
+            background-size: cover; background-position: center;
+            filter: brightness(0.35) contrast(1.1); z-index: -1;
+        }
+        
+        /* MEJORA: Glassmorphism Refinado */
         .glass { 
-            background: rgba(255, 255, 255, 0.06); 
-            backdrop-filter: blur(25px); 
-            -webkit-backdrop-filter: blur(25px);
+            background: rgba(255, 255, 255, 0.04); 
+            backdrop-filter: blur(25px) saturate(160%); 
+            -webkit-backdrop-filter: blur(25px) saturate(160%);
             border: 1px solid rgba(255, 255, 255, 0.1); 
             border-radius: 32px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
 
         .fade-in { animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* MEJORA: Animación para las tarjetas de encuestas */
+        .survey-card {
+            animation: slideIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(15px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         .bottom-nav {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 400px; height: 80px;
-            background: rgba(40, 20, 18, 0.8); backdrop-filter: blur(30px);
+            background: rgba(20, 10, 8, 0.85); backdrop-filter: blur(35px);
             border-radius: 40px; display: flex; justify-content: space-around; 
             align-items: center; z-index: 1000; border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
         }
 
         .nav-item {
             display: flex; flex-direction: column; align-items: center;
-            color: rgba(255,255,255,0.3); text-decoration: none; transition: 0.4s;
-            font-size: 10px; font-weight: 800; text-transform: uppercase;
+            color: rgba(255,255,255,0.25); text-decoration: none; transition: 0.3s;
+            font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
         }
         .nav-item i { font-size: 20px; margin-bottom: 4px; }
-        .nav-item.active { color: var(--accent); transform: translateY(-5px); }
+        .nav-item.active { color: var(--accent); }
         
-        .nav-center-wrapper { position: relative; top: -25px; }
+        .nav-center-wrapper { position: relative; top: -20px; }
         .nav-center {
-            width: 60px; height: 60px;
-            background: linear-gradient(135deg, var(--accent), #ffcc80);
-            border-radius: 20px; display: flex; align-items: center;
-            justify-content: center; color: #3a1f1d;
-            box-shadow: 0 15px 30px rgba(232, 156, 44, 0.3);
+            width: 62px; height: 62px;
+            background: linear-gradient(135deg, var(--accent), #ffb347);
+            border-radius: 22px; display: flex; align-items: center;
+            justify-content: center; color: #1a0f0e;
+            box-shadow: 0 15px 35px rgba(232, 156, 44, 0.35);
             transform: rotate(45deg); border: 4px solid var(--brand);
         }
-        .nav-center i { transform: rotate(-45deg); font-size: 1.5rem; }
+        .nav-center i { transform: rotate(-45deg); font-size: 1.6rem; }
 
         .shimmer {
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
@@ -90,31 +96,40 @@
 
     <div id="bg-image"></div>
 
-    <div id="update-modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100000; display: none; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(10px);">
-        <div class="glass" style="background: #2d1b1a; border: 1px solid #e89c2c; width: 100%; max-width: 320px; padding: 30px; text-align: center;">
-            <div style="width: 60px; height: 60px; background: rgba(232,156,44,0.2); color: #e89c2c; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                <i class="fa-solid fa-bolt-lightning text-2xl"></i>
+    <div id="update-modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100000; display: none; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(15px);">
+        <div class="glass" style="background: #1a0f0e; border: 1px solid #e89c2c; width: 100%; max-width: 320px; padding: 35px; text-align: center;">
+            <div class="w-16 h-16 bg-orange-400/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-bolt-lightning text-3xl"></i>
             </div>
-            <h2 style="font-weight: 900; font-style: italic; font-size: 20px; margin-bottom: 5px; color: white;">NUEVA VERSIÓN</h2>
-            <p id="v-tag" style="color: #e89c2c; font-size: 10px; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px;">VERSIÓN 1.0.0</p>
-            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; text-align: left; margin-bottom: 25px;">
-                <p id="v-msg" style="font-size: 12px; opacity: 0.8; line-height: 1.5; color: white;"></p>
+            <h2 class="font-black italic text-xl mb-1 uppercase tracking-tighter">Nueva Versión</h2>
+            <p id="v-tag" class="text-orange-400 text-[10px] font-black tracking-[3px] mb-6">VERSIÓN --</p>
+            <div class="bg-black/40 p-4 rounded-2xl text-left mb-8 border border-white/5">
+                <p id="v-msg" class="text-xs opacity-70 leading-relaxed"></p>
             </div>
-            <button onclick="closeUpdate()" style="width: 100%; padding: 15px; background: #e89c2c; color: #4a2c2a; border-radius: 15px; font-weight: 900; font-size: 10px; text-transform: uppercase; border: none;">Actualizar Ahora</button>
+            <button onclick="startInstallation()" class="w-full py-4 bg-orange-400 text-black rounded-2xl font-black text-[11px] uppercase tracking-widest active:scale-95 transition-transform">Actualizar Sistema</button>
         </div>
+    </div>
+
+    <div id="installing-screen" style="position: fixed; inset: 0; background: #000; z-index: 110000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(20px);">
+        <div class="relative">
+            <div class="w-20 h-20 border-4 border-orange-400/10 border-top-orange-400 rounded-full animate-spin" style="border-top-color: #e89c2c;"></div>
+            <i class="fa-solid fa-cloud-arrow-down absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-orange-400 text-xl"></i>
+        </div>
+        <h2 class="text-white font-black uppercase tracking-[5px] mt-8 text-sm">Instalando Elite</h2>
+        <p id="install-progress" class="text-orange-400/60 text-[9px] font-black uppercase mt-3 tracking-widest">Sincronizando Core...</p>
     </div>
 
     <header class="p-8 pt-20 flex justify-between items-start fade-in">
         <div>
             <div class="flex items-center gap-2 mb-2">
-                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                <p class="text-[10px] font-black text-white/40 tracking-[0.4em] uppercase">Cloud Sincronizado</p>
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.6)]"></span>
+                <p class="text-[10px] font-black text-white/40 tracking-[0.4em] uppercase">SmartFuh 2026</p>
             </div>
-            <h1 class="text-4xl font-black italic tracking-tighter leading-none">HOLA, <br><span id="userName" class="text-orange-400">...</span></h1>
+            <h1 class="text-4xl font-black italic tracking-tighter leading-none uppercase">Hola, <br><span id="userName" class="text-orange-400">...</span></h1>
         </div>
         <button onclick="window.location.href='perfil.html'" class="relative active:scale-90 transition-transform">
-            <div class="w-16 h-16 glass p-1 border-white/10 overflow-hidden">
-                <img src="1234.png" class="w-full h-full object-cover rounded-[24px]">
+            <div class="w-16 h-16 glass p-1 border-white/20 overflow-hidden rounded-[24px]">
+                <img src="1234.png" class="w-full h-full object-cover rounded-[20px]">
             </div>
         </button>
     </header>
@@ -124,43 +139,45 @@
             <div class="relative z-10 space-y-1">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-location-dot text-orange-400 text-[10px]"></i>
-                    <span class="text-[10px] font-black uppercase opacity-60 tracking-widest" id="locationLabel">Cargando...</span>
+                    <span class="text-[10px] font-black uppercase opacity-60 tracking-widest" id="locationLabel">Ubicando...</span>
                 </div>
                 <h2 class="text-6xl font-black tracking-tighter" id="tempDisplay">--°</h2>
-                <p class="text-[9px] font-bold opacity-40 uppercase">Sensación Térmica: <span id="lastUpdate">--</span></p>
+                <p class="text-[9px] font-bold opacity-40 uppercase tracking-tighter">Status: <span id="lastUpdate" class="text-orange-400">Sincronizando</span></p>
             </div>
             <div class="text-right z-10">
-                <i class="fa-solid fa-cloud-sun text-4xl text-orange-400"></i>
-                <p id="weatherDesc" class="text-[10px] font-black uppercase text-white mt-2">Despejado</p>
+                <div id="weatherIconContainer">
+                    <i class="fa-solid fa-cloud-sun text-4xl text-orange-400"></i>
+                </div>
+                <p id="weatherDesc" class="text-[10px] font-black uppercase text-white mt-3 tracking-widest">Cargando</p>
             </div>
         </section>
 
         <div class="grid grid-cols-2 gap-4 fade-in" style="animation-delay: 0.3s;">
-            <div class="glass p-5 border-t border-white/10">
-                <p class="text-[9px] font-black opacity-40 uppercase mb-2 tracking-widest">Base de Datos</p>
-                <div class="flex items-baseline gap-1">
-                    <h4 class="text-3xl font-black italic" id="stat-count">0</h4>
-                    <span class="text-[8px] text-orange-400 font-bold uppercase">Docs</span>
+            <div class="glass p-6 border-t border-white/10">
+                <p class="text-[9px] font-black opacity-40 uppercase mb-3 tracking-widest">Base de Datos</p>
+                <div class="flex items-baseline gap-2">
+                    <h4 class="text-4xl font-black italic" id="stat-count">0</h4>
+                    <span class="text-[9px] text-orange-400 font-black uppercase">Docs</span>
                 </div>
             </div>
-            <div class="glass p-5 border-t border-white/10">
-                <p class="text-[9px] font-black opacity-40 uppercase mb-2 tracking-widest">Seguridad</p>
+            <div class="glass p-6 border-t border-white/10 flex flex-col justify-between">
+                <p class="text-[9px] font-black opacity-40 uppercase mb-3 tracking-widest">Seguridad</p>
                 <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <h4 class="text-[10px] font-black text-green-400 uppercase tracking-widest">SSL Activo</h4>
+                    <div class="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_8px_#22c55e]"></div>
+                    <h4 class="text-[10px] font-black text-green-400 uppercase tracking-widest">Encriptado</h4>
                 </div>
             </div>
         </div>
 
         <div class="fade-in pb-10" style="animation-delay: 0.4s;">
-            <div class="flex justify-between items-center mb-5 px-2">
-                <h3 class="text-[11px] font-black opacity-40 uppercase tracking-[0.2em]">Últimas Encuestas</h3>
-                <i class="fa-solid fa-bolt text-orange-400 text-xs"></i>
+            <div class="flex justify-between items-center mb-6 px-2">
+                <h3 class="text-[11px] font-black opacity-40 uppercase tracking-[0.3em]">Módulos Recientes</h3>
+                <i class="fa-solid fa-arrow-trend-up text-orange-400 text-xs"></i>
             </div>
             
             <div id="listaEncuestas" class="space-y-4">
-                <div class="glass p-6 shimmer opacity-50"></div>
-                <div class="glass p-6 shimmer opacity-30"></div>
+                <div class="glass p-8 shimmer opacity-40"></div>
+                <div class="glass p-8 shimmer opacity-20"></div>
             </div>
         </div>
     </main>
@@ -184,104 +201,102 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Clima
+        // MEJORA: Diccionario de Clima Pro
+        function getWeatherInfo(code) {
+            const map = {
+                0: { txt: "Despejado", icon: "fa-sun" },
+                1: { txt: "Casi Despejado", icon: "fa-cloud-sun" },
+                2: { txt: "Parcialmente Nublado", icon: "fa-cloud-sun" },
+                3: { txt: "Nublado", icon: "fa-cloud" },
+                45: { txt: "Niebla", icon: "fa-smog" },
+                61: { txt: "Lluvia Ligera", icon: "fa-cloud-rain" },
+                95: { txt: "Tormenta", icon: "fa-bolt-lightning" }
+            };
+            return map[code] || { txt: "Estable", icon: "fa-cloud" };
+        }
+
         async function updateWeather() {
             navigator.geolocation.getCurrentPosition(async (pos) => {
                 const { latitude, longitude } = pos.coords;
                 try {
                     const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
                     const data = await res.json();
+                    const info = getWeatherInfo(data.current_weather.weathercode);
+                    
                     document.getElementById('tempDisplay').innerText = `${Math.round(data.current_weather.temperature)}°`;
-                    document.getElementById('lastUpdate').innerText = "Estable";
-                } catch(e) { console.log("Weather Error"); }
+                    document.getElementById('weatherDesc').innerText = info.txt;
+                    document.getElementById('weatherIconContainer').innerHTML = `<i class="fa-solid ${info.icon} text-4xl text-orange-400"></i>`;
+                    document.getElementById('lastUpdate').innerText = "Online";
+                } catch(e) { console.log("Weather error"); }
             }, () => {
-                document.getElementById('locationLabel').innerText = "GPS Desactivado";
+                document.getElementById('locationLabel').innerText = "Sin GPS";
             });
         }
 
-        // Navegación Dinámica
+        // MEJORA: Contador animado para stats
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) { window.requestAnimationFrame(step); }
+            };
+            window.requestAnimationFrame(step);
+        }
+
         function buildNav(rol) {
             const nav = document.getElementById('mainNav');
             const isAdmin = (rol === 'administrador');
             nav.innerHTML = `
-                <a href="inicio.html" class="nav-item active">
-                    <i class="fa-solid fa-house"></i>
-                    <span>Inicio</span>
-                </a>
+                <a href="inicio.html" class="nav-item active"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
                 <a href="${isAdmin ? 'reportes.html' : 'responder.html'}" class="nav-item">
-                    <i class="fa-solid ${isAdmin ? 'fa-chart-pie' : 'fa-clipboard-list'}"></i>
-                    <span>${isAdmin ? 'Reportes' : 'Lista'}</span>
+                    <i class="fa-solid ${isAdmin ? 'fa-chart-pie' : 'fa-clipboard-list'}"></i><span>${isAdmin ? 'Reportes' : 'Lista'}</span>
                 </a>
                 <a href="${isAdmin ? 'creador.html' : 'buscar.html'}" class="nav-center-wrapper">
                     <div class="nav-center"><i class="fa-solid ${isAdmin ? 'fa-plus' : 'fa-qrcode'}"></i></div>
                 </a>
-                <a href="perfil.html" class="nav-item">
-                    <i class="fa-solid fa-user-ninja"></i>
-                    <span>Perfil</span>
-                </a>
-                <a href="ajustes.html" class="nav-item">
-                    <i class="fa-solid fa-sliders"></i>
-                    <span>Ajustes</span>
-                </a>
+                <a href="perfil.html" class="nav-item"><i class="fa-solid fa-user-ninja"></i><span>Perfil</span></a>
+                <a href="ajustes.html" class="nav-item"><i class="fa-solid fa-sliders"></i><span>Ajustes</span></a>
             `;
         }
 
-        // Variable global para la versión detectada
-window.pendingVersion = "";
-
-// Función mejorada para detectar actualizaciones
-async function checkUpdates() {
-    // Usamos onSnapshot para que detecte la actualización AL INSTANTE sin recargar
-    db.collection('system').doc('version_control').onSnapshot((doc) => {
-        if (doc.exists) {
-            const data = doc.data();
-            const lastSeen = localStorage.getItem('last_version_seen') || "1.0.0";
-
-            if (data.currentVersion !== lastSeen) {
-                window.pendingVersion = data.currentVersion;
-                document.getElementById('v-tag').innerText = `VERSIÓN ${data.currentVersion}`;
-                document.getElementById('v-msg').innerText = data.releaseNotes || "Mejoras de rendimiento y estabilidad.";
-                document.getElementById('update-modal').style.display = 'flex';
-            }
+        function checkUpdates() {
+            db.collection('system').doc('version_control').onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    const lastSeen = localStorage.getItem('last_version_seen') || "1.0.0";
+                    if (data.currentVersion !== lastSeen) {
+                        window.pendingVersion = data.currentVersion;
+                        document.getElementById('v-tag').innerText = `VERSIÓN ${data.currentVersion}`;
+                        document.getElementById('v-msg').innerText = data.releaseNotes || "Optimizaciones de red SmartFuh.";
+                        document.getElementById('update-modal').style.display = 'flex';
+                    }
+                }
+            });
         }
-    });
-}
 
-// Función que simula la instalación
-async function startInstallation() {
-    // 1. Cerramos el modal de aviso
-    document.getElementById('update-modal').style.display = 'none';
-    
-    // 2. Mostramos la pantalla negra de instalación
-    const installScreen = document.getElementById('installing-screen');
-    const progressText = document.getElementById('install-progress');
-    installScreen.style.display = 'flex';
+        async function startInstallation() {
+            document.getElementById('update-modal').style.display = 'none';
+            document.getElementById('installing-screen').style.display = 'flex';
+            const progressText = document.getElementById('install-progress');
 
-    // 3. Simulamos pasos técnicos
-    setTimeout(() => { progressText.innerText = "Verificando archivos core..."; }, 1200);
-    setTimeout(() => { progressText.innerText = "Reescribiendo registros en caché..."; }, 2500);
-    setTimeout(() => { progressText.innerText = "Optimizando base de datos..."; }, 3800);
+            setTimeout(() => { progressText.innerText = "Reescribiendo Caché..."; }, 1500);
+            setTimeout(() => { progressText.innerText = "Validando Integridad..."; }, 3000);
 
-    // 4. Finalizamos, guardamos la versión y recargamos
-    setTimeout(() => {
-        localStorage.setItem('last_version_seen', window.pendingVersion);
-        location.reload();
-    }, 5000);
-}
+            setTimeout(() => {
+                localStorage.setItem('last_version_seen', window.pendingVersion);
+                location.reload();
+            }, 5000);
+        }
 
-// Cambiamos el comportamiento del botón del modal
-function closeUpdate() {
-    startInstallation(); // En lugar de solo cerrar, inicia la instalación
-}
-
-        // Cargar Datos
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 const userDoc = await db.collection('usuarios').doc(user.uid).get();
                 if(userDoc.exists) {
                     const userData = userDoc.data();
-                    document.getElementById('userName').innerText = userData.nombre.split(' ')[0].toUpperCase();
-                    document.getElementById('locationLabel').innerText = userData.ciudad || "ZONA ACTIVA";
+                    document.getElementById('userName').innerText = userData.nombre.split(' ')[0];
+                    document.getElementById('locationLabel').innerText = userData.ciudad || "Sede Elite";
                     buildNav(userData.rol);
                     loadSurveys();
                     updateWeather();
@@ -292,32 +307,30 @@ function closeUpdate() {
 
         async function loadSurveys() {
             const snap = await db.collection('encuestas').limit(5).get();
-            document.getElementById('stat-count').innerText = snap.size;
+            const statElement = document.getElementById('stat-count');
+            animateValue(statElement, 0, snap.size, 1500);
+
             let html = '';
+            let i = 0;
             snap.forEach(doc => {
                 const d = doc.data();
                 html += `
-                <div class="glass p-5 flex items-center gap-4 active:scale-95 transition-all" onclick="window.location.href='responder.html?id=${doc.id}'">
-                    <div class="w-12 h-12 rounded-xl bg-orange-400/10 flex items-center justify-center text-orange-400">
-                        <i class="fa-solid fa-file-signature"></i>
+                <div class="glass p-5 flex items-center gap-4 active:scale-95 transition-all survey-card" style="animation-delay: ${i * 0.1}s" onclick="window.location.href='responder.html?id=${doc.id}'">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-400/10 flex items-center justify-center text-orange-400 border border-orange-400/10">
+                        <i class="fa-solid fa-file-signature text-lg"></i>
                     </div>
                     <div class="flex-1">
-                        <h4 class="text-[12px] font-black uppercase tracking-tight">${d.titulo || 'Sin Título'}</h4>
-                        <p class="text-[9px] opacity-40 font-bold uppercase tracking-tighter">ID: ${doc.id.substring(0,8)}</p>
+                        <h4 class="text-[12px] font-black uppercase tracking-tight text-white/90">${d.titulo || 'Módulo'}</h4>
+                        <p class="text-[9px] opacity-40 font-bold uppercase tracking-widest">UID: ${doc.id.substring(0,8)}</p>
                     </div>
-                    <i class="fa-solid fa-chevron-right text-[10px] opacity-20"></i>
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-white/5">
+                        <i class="fa-solid fa-chevron-right text-[10px] opacity-20"></i>
+                    </div>
                 </div>`;
+                i++;
             });
-            document.getElementById('listaEncuestas').innerHTML = html || '<p class="text-center opacity-20 py-10 text-xs">Sin encuestas</p>';
+            document.getElementById('listaEncuestas').innerHTML = html || '<p class="text-center opacity-20 py-10 text-xs">Sin módulos activos</p>';
         }
     </script>
-    <div id="installing-screen" style="position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 110000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(20px);">
-    <div style="position: relative;">
-        <div style="width: 80px; height: 80px; border: 4px solid rgba(232,156,44,0.1); border-top: 4px solid #e89c2c; border-radius: 50%; animate: spin 1s linear infinite;" class="animate-spin"></div>
-        <i class="fa-solid fa-cloud-arrow-down" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #e89c2c; font-size: 20px;"></i>
-    </div>
-    <h2 style="color: white; font-weight: 900; text-transform: uppercase; letter-spacing: 4px; margin-top: 30px; font-size: 14px;">Instalando Mejoras</h2>
-    <p id="install-progress" style="color: #e89c2c; opacity: 0.6; font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 10px; letter-spacing: 1px;">Sincronizando paquetes...</p>
-</div>
 </body>
 </html>
