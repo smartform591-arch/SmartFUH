@@ -23,7 +23,18 @@
             font-family: 'Inter', sans-serif; padding-bottom: 120px; 
             overflow-x: hidden; user-select: none;
         }
-        #videoBG { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.2; z-index: -1; filter: saturate(1.4) brightness(0.8); }
+        #bg-image {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('fondo de inicio.jpeg'); /* Tu imagen */
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.4) contrast(1.1); /* Oscurece un poco la imagen para que el texto sea legible */
+    z-index: -1;
+}
+
         
         .glass { 
             background: rgba(255, 255, 255, 0.06); 
@@ -77,9 +88,7 @@
 </head>
 <body>
 
-    <video autoplay muted loop playsinline id="videoBG">
-        <source src="12345.mp4" type="video/mp4">
-    </video>
+    <div id="bg-image"></div>
 
     <div id="update-modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100000; display: none; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(10px);">
         <div class="glass" style="background: #2d1b1a; border: 1px solid #e89c2c; width: 100%; max-width: 320px; padding: 30px; text-align: center;">
@@ -217,27 +226,53 @@
             `;
         }
 
-        // Checar Versión
-        async function checkUpdates() {
-            try {
-                const doc = await db.collection('system').doc('version_control').get();
-                if (doc.exists) {
-                    const data = doc.data();
-                    const lastSeen = localStorage.getItem('last_version_seen');
-                    if (data.currentVersion !== lastSeen) {
-                        document.getElementById('v-tag').innerText = `VERSIÓN ${data.currentVersion}`;
-                        document.getElementById('v-msg').innerText = data.releaseNotes;
-                        document.getElementById('update-modal').style.display = 'flex';
-                        window.pendingVersion = data.currentVersion;
-                    }
-                }
-            } catch (e) { console.log("Version check failed"); }
-        }
+        // Variable global para la versión detectada
+window.pendingVersion = "";
 
-        function closeUpdate() {
-            localStorage.setItem('last_version_seen', window.pendingVersion);
-            document.getElementById('update-modal').style.display = 'none';
+// Función mejorada para detectar actualizaciones
+async function checkUpdates() {
+    // Usamos onSnapshot para que detecte la actualización AL INSTANTE sin recargar
+    db.collection('system').doc('version_control').onSnapshot((doc) => {
+        if (doc.exists) {
+            const data = doc.data();
+            const lastSeen = localStorage.getItem('last_version_seen') || "1.0.0";
+
+            if (data.currentVersion !== lastSeen) {
+                window.pendingVersion = data.currentVersion;
+                document.getElementById('v-tag').innerText = `VERSIÓN ${data.currentVersion}`;
+                document.getElementById('v-msg').innerText = data.releaseNotes || "Mejoras de rendimiento y estabilidad.";
+                document.getElementById('update-modal').style.display = 'flex';
+            }
         }
+    });
+}
+
+// Función que simula la instalación
+async function startInstallation() {
+    // 1. Cerramos el modal de aviso
+    document.getElementById('update-modal').style.display = 'none';
+    
+    // 2. Mostramos la pantalla negra de instalación
+    const installScreen = document.getElementById('installing-screen');
+    const progressText = document.getElementById('install-progress');
+    installScreen.style.display = 'flex';
+
+    // 3. Simulamos pasos técnicos
+    setTimeout(() => { progressText.innerText = "Verificando archivos core..."; }, 1200);
+    setTimeout(() => { progressText.innerText = "Reescribiendo registros en caché..."; }, 2500);
+    setTimeout(() => { progressText.innerText = "Optimizando base de datos..."; }, 3800);
+
+    // 4. Finalizamos, guardamos la versión y recargamos
+    setTimeout(() => {
+        localStorage.setItem('last_version_seen', window.pendingVersion);
+        location.reload();
+    }, 5000);
+}
+
+// Cambiamos el comportamiento del botón del modal
+function closeUpdate() {
+    startInstallation(); // En lugar de solo cerrar, inicia la instalación
+}
 
         // Cargar Datos
         auth.onAuthStateChanged(async (user) => {
@@ -276,5 +311,13 @@
             document.getElementById('listaEncuestas').innerHTML = html || '<p class="text-center opacity-20 py-10 text-xs">Sin encuestas</p>';
         }
     </script>
+    <div id="installing-screen" style="position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 110000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(20px);">
+    <div style="position: relative;">
+        <div style="width: 80px; height: 80px; border: 4px solid rgba(232,156,44,0.1); border-top: 4px solid #e89c2c; border-radius: 50%; animate: spin 1s linear infinite;" class="animate-spin"></div>
+        <i class="fa-solid fa-cloud-arrow-down" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #e89c2c; font-size: 20px;"></i>
+    </div>
+    <h2 style="color: white; font-weight: 900; text-transform: uppercase; letter-spacing: 4px; margin-top: 30px; font-size: 14px;">Instalando Mejoras</h2>
+    <p id="install-progress" style="color: #e89c2c; opacity: 0.6; font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 10px; letter-spacing: 1px;">Sincronizando paquetes...</p>
+</div>
 </body>
 </html>
