@@ -43,10 +43,18 @@
             overflow-x: hidden;
         }
 
-        #videoBG {
-            position: fixed; inset: 0; width: 100%; height: 100%;
-            object-fit: cover; opacity: 0.25; z-index: -1; filter: grayscale(20%);
-        }
+        /* Nuevo estilo para la imagen de fondo */
+#bg-image {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('fondo de login.jpeg'); /* Tu imagen */
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.4) contrast(1.1); /* Oscurece un poco la imagen para que el texto sea legible */
+    z-index: -1;
+}
 
         .glass-card {
             background: rgba(255, 255, 255, 0.1);
@@ -128,13 +136,23 @@
         .scroll-container::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
         .hidden { display: none; }
+        #intro-screen {
+    transition: opacity 0.8s ease, visibility 0.8s;
+}
+
+#intro-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
     </style>
 </head>
 <body>
-
-    <video autoplay muted loop playsinline id="videoBG">
-        <source src="12345.mp4" type="video/mp4">
-    </video>
+<div id="intro-screen" class="fixed inset-0 z-[9999] bg-[#4a2c2a] flex items-center justify-center overflow-hidden">
+    <video id="intro-video" autoplay muted playsinline class="w-full h-full object-cover">
+        <source src="intro.mp4" type="video/mp4">
+        </video>
+</div>
+    <div id="bg-image"></div>
 
     <div class="glass-card p-8 md:p-10">
         <div class="text-center mb-6 shrink-0">
@@ -204,88 +222,135 @@
 
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSyCBiiY9GSlF-7r3wjBwcLCq5jyxKVOjAAE",
-            authDomain: "smartform-ee4bb.firebaseapp.com",
-            projectId: "smartform-ee4bb",
-            storageBucket: "smartform-ee4bb.firebasestorage.app",
-            messagingSenderId: "590912576678",
-            appId: "1:590912576678:web:5dd2406d46b31ada5b6867"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+    apiKey: "AIzaSyCBiiY9GSlF-7r3wjBwcLCq5jyxKVOjAAE",
+    authDomain: "smartform-ee4bb.firebaseapp.com",
+    projectId: "smartform-ee4bb",
+    storageBucket: "smartform-ee4bb.firebasestorage.app",
+    messagingSenderId: "590912576678",
+    appId: "1:590912576678:web:5dd2406d46b31ada5b6867"
+};
 
-        let selectedRole = 'usuario';
+// Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-        function setRole(role) {
-            selectedRole = role;
-            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`btn-role-${role}`).classList.add('active');
+let selectedRole = 'usuario';
+
+// 1. OBSERVADOR DE SESIÓN (Se ejecuta al cargar la página)
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log("Sesión activa:", user.email);
+        // Si ya está logueado, redirigir de inmediato
+        if (!window.location.href.includes('inicio.html')) {
+            window.location.href = 'inicio.html';
         }
+    } else {
+        console.log("Sin sesión activa");
+        // Opcional: Mostrar el body solo si no hay usuario para evitar parpadeo
+        document.body.style.opacity = "1";
+    }
+});
 
-        function switchSection(id) {
-            ['login', 'register', 'forgot'].forEach(s => document.getElementById(`section-${s}`).classList.add('hidden'));
-            document.getElementById(`section-${id}`).classList.remove('hidden');
-        }
+// 2. FUNCIONES DE INTERFAZ
+function setRole(role) {
+    selectedRole = role;
+    document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`btn-role-${role}`).classList.add('active');
+}
 
-        function showAlert(title, msg, icon) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-msg').innerText = msg;
-            document.getElementById('modal-icon').innerText = icon;
-            document.getElementById('custom-modal').classList.remove('hidden');
-            document.getElementById('custom-modal').classList.add('flex');
-        }
+function switchSection(id) {
+    ['login', 'register', 'forgot'].forEach(s => document.getElementById(`section-${s}`).classList.add('hidden'));
+    document.getElementById(`section-${id}`).classList.remove('hidden');
+}
 
-        function closeModal() { document.getElementById('custom-modal').classList.remove('flex'); document.getElementById('custom-modal').classList.add('hidden'); }
+function showAlert(title, msg, icon) {
+    document.getElementById('modal-title').innerText = title;
+    document.getElementById('modal-msg').innerText = msg;
+    document.getElementById('modal-icon').innerText = icon;
+    document.getElementById('custom-modal').classList.remove('hidden');
+    document.getElementById('custom-modal').classList.add('flex');
+}
 
-        async function handleLogin() {
-            const email = document.getElementById('login-email').value.trim();
-            const pass = document.getElementById('login-pass').value;
-            if(!email || !pass) return showAlert("Aviso", "Ingresa tus credenciales", "🔑");
+function closeModal() { 
+    document.getElementById('custom-modal').classList.remove('flex'); 
+    document.getElementById('custom-modal').classList.add('hidden'); 
+}
 
-            try {
-                await auth.signInWithEmailAndPassword(email, pass);
-                window.location.href = 'inicio.html';
-            } catch (error) {
-                showAlert("Acceso Denegado", "Correo o contraseña incorrectos", "❌");
-            }
-        }
+// 3. LÓGICA DE ACCESO CON PERSISTENCIA
+async function handleLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const pass = document.getElementById('login-pass').value;
 
-        async function handleRegister() {
-            const name = document.getElementById('reg-name').value;
-            const phone = document.getElementById('reg-phone').value;
-            const address = document.getElementById('reg-address').value;
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
+    if(!email || !pass) return showAlert("Aviso", "Ingresa tus credenciales", "🔑");
 
-            if(!name || !email || !pass) return showAlert("Faltan datos", "Nombre, correo y clave son obligatorios", "📝");
+    try {
+        // Aseguramos que la sesión se guarde localmente
+        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        await auth.signInWithEmailAndPassword(email, pass);
+        // Redirección automática por onAuthStateChanged
+    } catch (error) {
+        showAlert("Acceso Denegado", "Correo o contraseña incorrectos", "❌");
+    }
+}
 
-            try {
-                const cred = await auth.createUserWithEmailAndPassword(email, pass);
-                await db.collection('usuarios').doc(cred.user.uid).set({
-                    nombre: name,
-                    telefono: phone,
-                    direccion: address,
-                    correo: email,
-                    rol: selectedRole,
-                    fechaCreacion: new Date()
-                });
-                showAlert("Éxito", "Cuenta creada como " + selectedRole, "✅");
-                setTimeout(() => switchSection('login'), 1500);
-            } catch (error) {
-                showAlert("Error", "No se pudo registrar: " + error.message, "❌");
-            }
-        }
+// 4. REGISTRO DE USUARIOS
+async function handleRegister() {
+    const name = document.getElementById('reg-name').value;
+    const phone = document.getElementById('reg-phone').value;
+    const address = document.getElementById('reg-address').value;
+    const email = document.getElementById('reg-email').value;
+    const pass = document.getElementById('reg-pass').value;
 
-        async function handleForgot() {
-            const email = document.getElementById('forgot-email').value;
-            if(!email) return showAlert("Correo", "Ingresa tu email", "📧");
-            try {
-                await auth.sendPasswordResetEmail(email);
-                showAlert("Enviado", "Revisa tu bandeja de entrada", "📩");
-                switchSection('login');
-            } catch (e) { showAlert("Error", "Usuario no encontrado", "❌"); }
-        }
+    if(!name || !email || !pass) return showAlert("Faltan datos", "Nombre, correo y clave son obligatorios", "📝");
+
+    try {
+        const cred = await auth.createUserWithEmailAndPassword(email, pass);
+        await db.collection('usuarios').doc(cred.user.uid).set({
+            nombre: name,
+            telefono: phone,
+            direccion: address,
+            correo: email,
+            rol: selectedRole,
+            fechaCreacion: new Date()
+        });
+        showAlert("Éxito", "Cuenta creada como " + selectedRole, "✅");
+        setTimeout(() => switchSection('login'), 1500);
+    } catch (error) {
+        showAlert("Error", "No se pudo registrar: " + error.message, "❌");
+    }
+}
+
+// 5. RECUPERACIÓN DE CONTRASEÑA
+async function handleForgot() {
+    const email = document.getElementById('forgot-email').value;
+    if(!email) return showAlert("Correo", "Ingresa tu email", "📧");
+    try {
+        await auth.sendPasswordResetEmail(email);
+        showAlert("Enviado", "Revisa tu bandeja de entrada", "📩");
+        switchSection('login');
+    } catch (e) { 
+        showAlert("Error", "Usuario no encontrado", "❌"); 
+    }
+}
+// Control de la Intro de 7 segundos
+window.addEventListener('load', () => {
+    const intro = document.getElementById('intro-screen');
+    const video = document.getElementById('intro-video');
+
+    // Forzar que el video inicie (algunos navegadores bloquean el autoplay)
+    video.play().catch(error => console.log("Auto-play prevenido:", error));
+
+    // Esperar 7 segundos (7000ms) antes de desaparecer
+    setTimeout(() => {
+        intro.classList.add('fade-out');
+        
+        // Opcional: Eliminar el elemento del DOM después de la transición para ahorrar recursos
+        setTimeout(() => {
+            intro.remove();
+        }, 800); 
+    }, 7000); 
+});
     </script>
 </body>
 </html>
