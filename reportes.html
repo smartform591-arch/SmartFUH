@@ -14,7 +14,17 @@
             font-family: 'Inter', sans-serif; padding-bottom: 50px; 
             overflow-x: hidden;
         }
-        #videoBG { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; z-index: -1; filter: grayscale(1); }
+        #bg-image {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('fondo de login.jpeg'); /* Tu imagen */
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.4) contrast(1.1); /* Oscurece un poco la imagen para que el texto sea legible */
+    z-index: -1;
+}
         
         .glass { 
             background: rgba(255, 255, 255, 0.03); 
@@ -51,7 +61,7 @@
 </head>
 <body>
 
-    <video autoplay muted loop playsinline id="videoBG"><source src="12345.mp4" type="video/mp4"></video>
+    <div id="bg-image"></div>
 
     <header class="p-8 pt-16 flex items-center justify-between sticky top-0 z-50 bg-gradient-to-bottom from-var(--brand) to-transparent">
         <div class="flex items-center gap-4">
