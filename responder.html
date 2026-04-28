@@ -3,334 +3,296 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-    <title>SmartFuh | Terminal de Respuesta</title>
+    <title>SmartPet | Red Social Elite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;800&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --brand: #1a0f0e; --accent: #e89c2c; --border: rgba(255, 255, 255, 0.08); }
-        
-        .font-modern { font-family: 'Inter', sans-serif; }
-        .font-tech { font-family: 'JetBrains Mono', monospace; }
-
+        :root { --brand: #1a0f0e; --accent: #e89c2c; }
         body { 
-            margin: 0; background: var(--brand); color: white; 
-            padding-bottom: 150px; scroll-behavior: smooth; 
-            overflow-x: hidden; -webkit-tap-highlight-color: transparent;
+            background: var(--brand); color: white; font-family: 'Inter', sans-serif; 
+            margin: 0; padding-bottom: 100px; overflow-x: hidden;
         }
-
-        #bg-image {
-            position: fixed; inset: 0; width: 100%; height: 100%;
-            background-image: url('fondo de login.jpeg'); 
-            background-size: cover; background-position: center;
-            filter: brightness(0.3) contrast(1.1); z-index: -1;
-        }
-        
         .glass { 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border); border-radius: 32px; 
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 32px; 
         }
-
-        .home-btn {
-            position: fixed; bottom: 120px; right: 25px; width: 55px; height: 55px;
-            background: var(--accent); color: var(--brand); border-radius: 20px;
-            display: flex; items-center; justify-content: center; font-size: 20px;
-            box-shadow: 0 10px 30px rgba(232, 156, 44, 0.3); z-index: 999;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .feed-card { animation: slideUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Animaciones */
-        .fade-in { animation: fadeIn 0.6s ease forwards; opacity: 0; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .question-card { transition: all 0.4s ease; }
-        .question-card:focus-within { background: rgba(255,255,255,0.06); border-color: var(--accent); }
-
-        .input-text { 
-            width: 100%; background: rgba(0,0,0,0.4); 
-            border: 1.5px solid var(--border); 
-            border-radius: 22px; padding: 22px; color: white; 
-            outline: none; transition: 0.3s; font-weight: 600;
+        .btn-interact:active { transform: scale(0.8); transition: 0.1s; }
+        .like-active { color: #ef4444 !important; animation: heartBeat 0.3s ease; }
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
         }
-        .input-text:focus { border-color: var(--accent); background: rgba(0,0,0,0.6); }
-
-        .option-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1.5px solid var(--border);
-            padding: 20px; border-radius: 22px;
-            cursor: pointer; transition: 0.2s;
-            display: flex; align-items: center; gap: 15px;
-        }
-        .option-card.selected { background: var(--accent); color: var(--brand); border-color: var(--accent); font-weight: 900; }
-
-        .progress-bar-fill {
-            height: 100%; background: var(--accent);
-            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 0 20px var(--accent);
-        }
-
-        .btn-submit {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 92%; max-width: 450px; background: var(--accent); color: var(--brand);
-            font-weight: 900; padding: 22px; border-radius: 26px; 
-            text-transform: uppercase; letter-spacing: 2px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5); z-index: 100;
-            transition: 0.3s;
-        }
-        .btn-submit:disabled { opacity: 0.15; transform: translateX(-50%) scale(0.95); }
-
-        #success-screen {
-            position: fixed; inset: 0; background: var(--brand); z-index: 2000;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-        }
+        .hashtag { color: #e89c2c; font-weight: 900; }
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="font-modern">
+<body>
 
-    <div id="bg-image"></div>
-
-    <a href="inicio.html" class="home-btn" onclick="return confirm('¿Volver al inicio? Se perderá el progreso no guardado.')">
-        <i class="fa-solid fa-house"></i>
-    </a>
-
-    <div id="success-screen" class="p-10 text-center">
-        <div class="w-24 h-24 bg-orange-400 rounded-[32px] flex items-center justify-center mb-8 rotate-12 shadow-2xl mx-auto">
-            <i class="fa-solid fa-check text-4xl text-black"></i>
-        </div>
-        <h2 class="text-4xl font-black italic tracking-tighter mb-4 uppercase">Transmisión Exitosa</h2>
-        <p class="opacity-40 text-[10px] uppercase font-black tracking-[0.3em] mb-12">Reporte sincronizado con la base de datos.</p>
-        <button onclick="window.location.href='inicio.html'" class="w-full max-w-xs py-5 glass font-black uppercase text-[11px] tracking-widest text-orange-400">Volver al Panel</button>
-    </div>
-
-    <header class="p-8 pt-16 sticky top-0 z-50 bg-gradient-to-b from-[#1a0f0e] to-transparent">
-        <div class="flex justify-between items-end mb-6">
-            <div class="space-y-1">
-                <h1 id="survey-title" class="text-2xl font-black italic tracking-tighter uppercase leading-none">Cargando Encuesta...</h1>
-                <p id="timer" class="text-[9px] font-black text-orange-400 uppercase tracking-widest">CRONÓMETRO: 00:00</p>
-            </div>
-            <div class="text-right">
-                <span id="progress-text" class="text-2xl font-tech font-black text-orange-400">0%</span>
+    <nav class="fixed top-0 inset-x-0 z-50 bg-[#1a0f0e]/90 backdrop-blur-xl border-b border-white/5 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <a href="inicio.html" class="w-10 h-10 glass flex items-center justify-center text-white/50 active:scale-90 transition-all">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+            <div>
+                <h1 class="text-xl font-black italic tracking-tighter leading-none">SMART<span class="text-orange-400">FEED</span></h1>
+                <p class="text-[7px] font-black opacity-40 tracking-[0.4em] uppercase">Comunidad Global</p>
             </div>
         </div>
-        <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-            <div id="progress-bar" class="progress-bar-fill" style="width: 0%"></div>
-        </div>
-    </header>
+        <button onclick="toggleModal()" class="w-12 h-12 bg-orange-400 text-black rounded-2xl flex items-center justify-center shadow-lg active:scale-90 transition-all">
+            <i class="fa-solid fa-plus text-xl"></i>
+        </button>
+    </nav>
 
-    <main id="questions-container" class="px-6 space-y-6">
-        <div class="glass p-10 space-y-6 animate-pulse">
-            <div class="w-24 h-4 bg-white/10 rounded-full"></div>
-            <div class="w-full h-8 bg-white/10 rounded-xl"></div>
-            <div class="w-full h-20 bg-white/10 rounded-3xl"></div>
+    <div class="h-24"></div>
+
+    <main id="feedContainer" class="px-4 space-y-6 max-w-lg mx-auto pb-20">
+        <div id="loadingState" class="space-y-6">
+            <div class="glass h-80 w-full animate-pulse opacity-20"></div>
         </div>
     </main>
 
-    <button onclick="enviarRespuestas()" class="btn-submit" id="btn-enviar" style="display: none;" disabled>
-        Finalizar Reporte
-    </button>
+    <div id="postModal" class="fixed inset-0 z-[100] hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-sm" onclick="toggleModal()"></div>
+        <div class="glass w-full max-w-md p-8 space-y-5 relative border-t border-white/10 animate-[slideUp_0.3s]">
+            <div class="text-center">
+                <h2 class="text-2xl font-black italic italic uppercase">Crear <span class="text-orange-400">Post</span></h2>
+            </div>
 
-    <div id="toast-container" class="fixed top-10 left-1/2 -translate-x-1/2 z-[3000] w-[80%] pointer-events-none"></div>
+            <div onclick="document.getElementById('fileInput').click()" class="w-full aspect-video rounded-[24px] border-2 border-dashed border-white/10 flex flex-col items-center justify-center cursor-pointer overflow-hidden relative">
+                <img id="previewImg" class="absolute inset-0 w-full h-full object-cover hidden">
+                <i class="fa-solid fa-image text-3xl opacity-20"></i>
+                <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="previewImage(event)">
+            </div>
+
+            <div class="space-y-3">
+                <input type="text" id="postAuthor" placeholder="TU NOMBRE / ALIAS" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-[10px] font-black tracking-widest outline-none focus:border-orange-400 uppercase">
+                
+                <select id="postCategory" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-[10px] font-black uppercase text-orange-400 outline-none">
+                    <option value="General">🏷️ General</option>
+                    <option value="Urgente">🚨 Emergencia</option>
+                    <option value="Adopción">🏠 Adopción</option>
+                    <option value="Extravío">🔍 Extravío</option>
+                </select>
+
+                <textarea id="postDesc" placeholder="¿Qué quieres compartir? Usa #hashtags..." rows="3" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-xs font-medium outline-none focus:border-orange-400"></textarea>
+            </div>
+
+            <button onclick="savePost()" id="btnPublish" class="w-full py-5 bg-orange-400 text-black rounded-2xl font-black uppercase text-[11px] tracking-[3px] shadow-xl active:scale-95 transition-all">
+                Publicar en SmartPet
+            </button>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCBiiY9GSlF-7r3wjBwcLCq5jyxKVOjAAE",
-            authDomain: "smartform-ee4bb.firebaseapp.com",
-            projectId: "smartform-ee4bb",
-            storageBucket: "smartform-ee4bb.firebasestorage.app",
-            messagingSenderId: "590912576678",
-            appId: "1:590912576678:web:5dd2406d46b31ada5b6867"
-        };
+    // Configuración de Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyCBiiY9GSlF-7r3wjBwcLCq5jyxKVOjAAE",
+  authDomain: "smartform-ee4bb.firebaseapp.com",
+  projectId: "smartform-ee4bb",
+  storageBucket: "smartform-ee4bb.firebasestorage.app",
+  messagingSenderId: "590912576678",
+  appId: "1:590912576678:web:5dd2406d46b31ada5b6867",
+  measurementId: "G-07XSZSSCQ5"
+    };
+
+    // Inicialización única
+    if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+    }
+    const db = firebase.firestore();
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const surveyId = urlParams.get('id');
-        let surveyData = null;
-        let totalPreguntas = 0;
-        let formularioIniciado = false;
-        let startTime = Date.now();
-        
-        // Carga de borrador
-        let respuestasGuardadas = JSON.parse(localStorage.getItem(`draft_${surveyId}`)) || {};
+    // --- UTILIDADES DE UI ---
+    
+    const toggleModal = () => document.getElementById('postModal').classList.toggle('hidden');
 
-        function showToast(text) {
-            const t = document.createElement('div');
-            t.className = 'glass p-4 mb-3 text-[9px] font-black uppercase tracking-widest text-center border-orange-400/40 fade-in text-orange-400';
-            t.innerText = text;
-            document.getElementById('toast-container').appendChild(t);
-            setTimeout(() => t.remove(), 3000);
+    function previewImage(event) {
+        const preview = document.getElementById('previewImg');
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => { 
+                preview.src = e.target.result; 
+                preview.classList.remove('hidden'); 
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    const formatText = (text) => text.replace(/#(\w+)/g, '<span class="hashtag">#$1</span>');
+
+    // --- LÓGICA DE BASE DE DATOS ---
+
+    async function savePost() {
+        const authorInput = document.getElementById('postAuthor');
+        const descInput = document.getElementById('postDesc');
+        const categoryInput = document.getElementById('postCategory');
+        const previewImg = document.getElementById('previewImg');
+        const btn = document.getElementById('btnPublish');
+
+        // Validaciones
+        if (!descInput.value.trim() || previewImg.classList.contains('hidden')) {
+            return alert("⚠️ Por favor, añade una imagen y una descripción.");
         }
 
-        // Cronómetro mejorado
-        setInterval(() => {
-            const diff = Math.floor((Date.now() - startTime) / 1000);
-            const m = Math.floor(diff / 60).toString().padStart(2, '0');
-            const s = (diff % 60).toString().padStart(2, '0');
-            document.getElementById('timer').innerText = `TIEMPO TRANSCURRIDO: ${m}:${s}`;
-        }, 1000);
+        btn.disabled = true;
+        btn.innerText = "PUBLICANDO...";
 
-        async function cargarEncuesta() {
-            if (!surveyId) { window.location.href = 'inicio.html'; return; }
-            try {
-                const doc = await db.collection('encuestas').doc(surveyId).get();
-                if (!doc.exists) { window.location.href = 'inicio.html'; return; }
-                
-                surveyData = doc.data();
-                totalPreguntas = surveyData.preguntas.length;
-                document.getElementById('survey-title').innerText = surveyData.titulo;
-                
-                renderizarPreguntas(surveyData.preguntas);
-                document.getElementById('btn-enviar').style.display = 'block';
-                
-                recuperarBorrador();
-            } catch (e) { showToast("ERROR DE CONEXIÓN CON EL SERVIDOR"); }
-        }
-
-        function renderizarPreguntas(preguntas) {
-            const container = document.getElementById('questions-container');
-            container.innerHTML = '';
-            preguntas.forEach((p, index) => {
-                const div = document.createElement('div');
-                div.className = 'glass p-8 space-y-6 question-card fade-in';
-                div.style.animationDelay = `${index * 0.1}s`;
-                
-                let inputHTML = p.tipo === 'texto' ? 
-                    `<input type="text" class="input-text resp-input" data-pregunta="${p.texto}" placeholder="Ingrese respuesta..." oninput="manejarEntradaTexto(this)">` :
-                    `<div class="grid grid-cols-1 gap-3" data-group="${p.texto}">
-                        ${p.opciones.map(opt => `
-                            <div class="option-card" onclick="seleccionarOpcion(this, '${p.texto}', '${opt}')" data-value="${opt}">
-                                <div class="w-5 h-5 rounded-full border-2 border-white/20 flex items-center justify-center">
-                                    <div class="w-2.5 h-2.5 rounded-full bg-black opacity-0"></div>
-                                </div>
-                                <span class="text-[13px] uppercase font-black tracking-tight">${opt}</span>
-                            </div>`).join('')}
-                        <input type="hidden" class="resp-input" data-pregunta="${p.texto}">
-                    </div>`;
-
-                div.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <span class="text-[9px] font-black bg-white/5 px-3 py-1 rounded-full uppercase tracking-widest opacity-40">Módulo ${index + 1}</span>
-                        <i class="fa-solid fa-circle-check text-orange-400 opacity-0 transition-all check-icon"></i>
-                    </div>
-                    <h3 class="text-xl font-black italic tracking-tighter leading-tight uppercase">${p.texto}</h3>
-                    ${inputHTML}`;
-                container.appendChild(div);
-            });
-        }
-
-        function manejarEntradaTexto(input) {
-            formularioIniciado = true;
-            const pregunta = input.getAttribute('data-pregunta');
-            respuestasGuardadas[pregunta] = input.value;
-            localStorage.setItem(`draft_${surveyId}`, JSON.stringify(respuestasGuardadas));
-            
-            const card = input.closest('.question-card');
-            if(input.value.trim().length > 0) {
-                card.querySelector('.check-icon').classList.replace('opacity-0', 'opacity-100');
-            } else {
-                card.querySelector('.check-icon').classList.replace('opacity-100', 'opacity-0');
-            }
-            actualizarProgreso();
-        }
-
-        function seleccionarOpcion(el, pregunta, valor, conScroll = true) {
-            if (window.navigator.vibrate) window.navigator.vibrate(10);
-            formularioIniciado = true;
-            
-            const parent = el.parentElement;
-            parent.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
-            el.classList.add('selected');
-            
-            const inputHidden = parent.querySelector('input[type="hidden"]');
-            inputHidden.value = valor;
-            
-            // Guardar en borrador
-            respuestasGuardadas[pregunta] = valor;
-            localStorage.setItem(`draft_${surveyId}`, JSON.stringify(respuestasGuardadas));
-
-            el.closest('.question-card').querySelector('.check-icon').classList.replace('opacity-0', 'opacity-100');
-            actualizarProgreso();
-            
-            if (conScroll) {
-                const next = el.closest('.question-card').nextElementSibling;
-                if (next) setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
-            }
-        }
-
-        function recuperarBorrador() {
-            const inputs = document.querySelectorAll('.resp-input');
-            inputs.forEach(input => {
-                const preg = input.getAttribute('data-pregunta');
-                if (respuestasGuardadas[preg]) {
-                    if (input.type === 'hidden') {
-                        const val = respuestasGuardadas[preg];
-                        input.value = val;
-                        const option = input.closest('.question-card').querySelector(`.option-card[data-value="${val}"]`);
-                        if(option) seleccionarOpcion(option, preg, val, false);
-                    } else {
-                        input.value = respuestasGuardadas[preg];
-                        manejarEntradaTexto(input);
-                    }
-                }
-            });
-        }
-
-        function actualizarProgreso() {
-            const inputs = document.querySelectorAll('.resp-input');
-            let respondidas = 0;
-            inputs.forEach(i => { if(i.value.trim() !== '') respondidas++; });
-            
-            const porcentaje = Math.round((respondidas / totalPreguntas) * 100);
-            document.getElementById('progress-bar').style.width = porcentaje + '%';
-            document.getElementById('progress-text').innerText = porcentaje + '%';
-            document.getElementById('btn-enviar').disabled = (respondidas < totalPreguntas);
-        }
-
-        async function enviarRespuestas() {
-            const btn = document.getElementById('btn-enviar');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-tower-broadcast animate-pulse mr-3"></i> TRANSMITIENDO...`;
-
-            try {
-                const user = auth.currentUser;
-                const rDetalladas = {};
-                document.querySelectorAll('.resp-input').forEach(i => {
-                    rDetalladas[i.getAttribute('data-pregunta')] = i.value;
-                });
-
-                await db.collection('respuestas').add({
-                    encuestaId: surveyId,
-                    tituloEncuesta: surveyData.titulo,
-                    usuarioEmail: user ? user.email : 'Operador Externo',
-                    usuarioNombre: user ? user.displayName : 'Anónimo',
-                    respuestas: rDetalladas,
-                    duracion: document.getElementById('timer').innerText,
-                    fecha: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                localStorage.removeItem(`draft_${surveyId}`);
-                formularioIniciado = false;
-                document.getElementById('success-screen').style.display = 'flex';
-                window.scrollTo(0,0);
-            } catch (e) {
-                showToast("ERROR CRÍTICO AL ENVIAR REPORTE");
-                btn.disabled = false;
-                btn.innerText = "REINTENTAR ENVÍO";
-            }
-        }
-
-        window.onbeforeunload = (e) => {
-            if (formularioIniciado) return "Existen cambios no sincronizados.";
+        const newPost = {
+            autor: authorInput.value.trim() || "Anónimo",
+            titulo: categoryInput.value,
+            descripcion: descInput.value.trim(),
+            foto: previewImg.src,
+            fecha: Date.now(),
+            likes: 0,
+            comentarios: 0
         };
 
-        cargarEncuesta();
-    </script>
+        try {
+            await db.collection('social_feed').add(newPost);
+            
+            // Resetear formulario
+            authorInput.value = '';
+            descInput.value = '';
+            previewImg.classList.add('hidden');
+            toggleModal();
+            alert("✨ ¡Publicado con éxito!");
+        } catch (error) {
+            console.error("Error al guardar:", error);
+            alert("❌ Hubo un problema al subir tu post.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Publicar en SmartPet";
+        }
+    }
+
+    async function handleLike(id, btn) {
+        const isLiked = btn.classList.toggle('like-active');
+        const postRef = db.collection('social_feed').doc(id);
+        
+        // Efecto visual inmediato
+        const countSpan = btn.querySelector('.count');
+        let currentCount = parseInt(countSpan.innerText);
+        countSpan.innerText = isLiked ? currentCount + 1 : currentCount - 1;
+
+        // Actualización real en Firebase (Atomic increment)
+        try {
+            await postRef.update({
+                likes: firebase.firestore.FieldValue.increment(isLiked ? 1 : -1)
+            });
+        } catch (e) {
+            console.error("Error al dar like:", e);
+        }
+    }
+
+    function handleComment(id) {
+        const comment = prompt("Escribe tu comentario:");
+        if (comment && comment.trim() !== "") {
+            db.collection('social_feed').doc(id).update({
+                comentarios: firebase.firestore.FieldValue.increment(1)
+            });
+            alert("✅ Comentario enviado");
+        }
+    }
+
+    async function sharePost(title, text) {
+        const shareData = { title, text, url: window.location.href };
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert("🔗 Enlace copiado al portapapeles");
+            }
+        } catch (err) {
+            console.log("Error al compartir:", err);
+        }
+    }
+
+    // --- CARGA EN TIEMPO REAL ---
+
+    function loadFeed() {
+        const container = document.getElementById('feedContainer');
+        
+        // onSnapshot escucha cambios sin recargar la página
+        db.collection('social_feed').orderBy('fecha', 'desc').onSnapshot((querySnapshot) => {
+            container.innerHTML = ''; // Limpiar feed
+            
+            if (querySnapshot.empty) {
+                container.innerHTML = '<p class="text-center opacity-30 py-10">No hay publicaciones aún...</p>';
+                return;
+            }
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const card = `
+                    <article class="glass overflow-hidden feed-card mb-6">
+                        <div class="p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full border-2 border-orange-400 p-0.5">
+                                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(data.autor)}&background=e89c2c&color=1a0f0e" class="w-full h-full rounded-full">
+                                </div>
+                                <div>
+                                    <p class="text-[11px] font-black uppercase tracking-tighter">${data.autor} <i class="fa-solid fa-circle-check text-[8px] text-blue-400 ml-1"></i></p>
+                                    <p class="text-[8px] opacity-40 font-bold uppercase tracking-[0.2em]">${data.titulo}</p>
+                                </div>
+                            </div>
+                            <span class="text-[8px] opacity-20 font-black">${new Date(data.fecha).toLocaleDateString()}</span>
+                        </div>
+
+                        <div class="px-2">
+                            <img src="${data.foto}" class="w-full aspect-square object-cover rounded-[24px]" loading="lazy">
+                        </div>
+
+                        <div class="p-5 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex gap-5">
+                                    <button onclick="handleLike('${doc.id}', this)" class="btn-interact flex items-center gap-1.5 text-white/60">
+                                        <i class="fa-solid fa-heart text-xl"></i>
+                                        <span class="text-[10px] font-black count">${data.likes || 0}</span>
+                                    </button>
+                                    <button onclick="handleComment('${doc.id}')" class="btn-interact flex items-center gap-1.5 text-white/60">
+                                        <i class="fa-solid fa-comment text-xl"></i>
+                                        <span class="text-[10px] font-black">${data.comentarios || 0}</span>
+                                    </button>
+                                    <button onclick="sharePost('${data.titulo}', '${data.descripcion}')" class="btn-interact text-white/60">
+                                        <i class="fa-solid fa-paper-plane text-xl"></i>
+                                    </button>
+                                </div>
+                                <button class="text-white/20"><i class="fa-solid fa-bookmark text-xl"></i></button>
+                            </div>
+
+                            <div class="space-y-1">
+                                <p class="text-[13px] leading-snug font-medium text-white/80">
+                                    <span class="font-black text-white mr-1 uppercase text-[11px]">${data.autor}</span>
+                                    ${formatText(data.descripcion)}
+                                </p>
+                            </div>
+                            
+                            <button onclick="handleComment('${doc.id}')" class="text-[10px] opacity-30 font-black uppercase tracking-widest hover:opacity-100 transition-all">Ver comentarios...</button>
+                        </div>
+                    </article>
+                `;
+                container.innerHTML += card;
+            });
+        }, (error) => {
+            console.error("Error en Snapshot:", error);
+            container.innerHTML = '<p class="text-center text-red-500">Error al conectar con la comunidad.</p>';
+        });
+    }
+
+    // Arrancar la aplicación
+    document.addEventListener('DOMContentLoaded', loadFeed);
+</script>
 </body>
 </html>
