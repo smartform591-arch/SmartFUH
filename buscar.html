@@ -346,62 +346,58 @@
             }, 30);
         });
 
-        // SELECCIÓN DE ANIMAL
-        function selectAnimal(id, label) {
-            selectedAnimalId = id;
-            const config = {
-                'Acuático': { sujeto: 'el ejemplar', lugar: 'pecera' },
-                'Reptil': { sujeto: 'el reptil', lugar: 'terrario' },
-                'Ave': { sujeto: 'el ave', lugar: 'jaula/aviario' },
-                'Perro': { sujeto: 'el perro', lugar: 'cama' },
-                'Gato': { sujeto: 'el gato', lugar: 'arenero' },
-                'Urgente': { sujeto: 'el rescatado', lugar: 'zona segura' }
-            }[id] || { sujeto: 'el adoptado', lugar: 'su lugar' };
+        // Actualización de la función selectAnimal
+function selectAnimal(id, label) {
+    selectedAnimalId = id;
+    localStorage.setItem('lastSearch', label); // Guarda el tipo de animal buscado
+    
+    const config = {
+        'Acuático': { sujeto: 'el ejemplar', lugar: 'pecera' },
+        'Reptil': { sujeto: 'el reptil', lugar: 'terrario' },
+        'Ave': { sujeto: 'el ave', lugar: 'jaula/aviario' },
+        'Perro': { sujeto: 'el perro', lugar: 'cama' },
+        'Gato': { sujeto: 'el gato', lugar: 'arenero' },
+        'Urgente': { sujeto: 'el rescatado', lugar: 'zona segura' }
+    }[id] || { sujeto: 'el adoptado', lugar: 'su lugar' };
 
-            document.getElementById('label-sleep').innerText = `18. ¿Dónde dormirá ${config.sujeto}? (Ej: ${config.lugar})`;
-            document.querySelector('.label-dynamic').innerText = `1. ¿Por qué deseas adoptar un ${label}?`;
-            
-            showSystemMsg(`Protocolo ${label} vinculado con SmartForm`);
-            changeStep(1);
-        }
+    document.getElementById('label-sleep').innerText = `18. ¿Dónde dormirá ${config.sujeto}? (Ej: ${config.lugar})`;
+    document.querySelector('.label-dynamic').innerText = `1. ¿Por qué deseas adoptar un ${label}?`;
+    
+    showSystemMsg(`Protocolo ${label} vinculado con SmartForm`);
+    changeStep(1);
+}
 
-        // NAVEGACIÓN
-        function changeStep(n) {
-            if (currentStep + n > totalSteps) {
-                showSystemMsg("Generando Perfil de Adoptante...");
-                setTimeout(() => {
-                    showSystemMsg("Sincronizando con SIAMFUH...");
-                    setTimeout(() => location.href = 'inicio.html', 1500);
-                }, 1000);
-                return;
-            }
+// Actualización de la función changeStep (lógica final)
+function changeStep(n) {
+    if (currentStep + n > totalSteps) {
+        showSystemMsg("Generando Perfil de Adoptante...");
+        setTimeout(() => {
+            showSystemMsg("Conectando con base de datos Firebase...");
+            setTimeout(() => {
+                // Redirige a la nueva página de match que hemos creado
+                location.href = 'match.html'; 
+            }, 1500);
+        }, 1000);
+        return;
+    }
 
-            document.getElementById(`step-${currentStep}`).classList.remove('active');
-            currentStep += n;
-            document.getElementById(`step-${currentStep}`).classList.add('active');
+    document.getElementById(`step-${currentStep}`).classList.remove('active');
+    currentStep += n;
+    document.getElementById(`step-${currentStep}`).classList.add('active');
 
-            // UI Updates
-            document.getElementById('step-count').innerText = currentStep === 0 ? "Selección" : `Paso ${currentStep} de 3`;
-            document.getElementById('prevBtn').classList.toggle('hidden', currentStep === 0);
-            
-            const nextBtn = document.getElementById('nextBtn');
-            if (currentStep === 0) {
-                nextBtn.classList.add('hidden');
-            } else {
-                nextBtn.classList.remove('hidden');
-                nextBtn.innerText = currentStep === totalSteps ? "Finalizar" : "Siguiente";
-            }
-            
-            document.querySelector('.steps-container').scrollTop = 0;
-        }
-
-        function handleBack() {
-            if (currentStep === 0) {
-                location.href = 'inicio.html';
-            } else {
-                changeStep(-1);
-            }
-        }
+    document.getElementById('step-count').innerText = currentStep === 0 ? "Selección" : `Paso ${currentStep} de 3`;
+    document.getElementById('prevBtn').classList.toggle('hidden', currentStep === 0);
+    
+    const nextBtn = document.getElementById('nextBtn');
+    if (currentStep === 0) {
+        nextBtn.classList.add('hidden');
+    } else {
+        nextBtn.classList.remove('hidden');
+        nextBtn.innerText = currentStep === totalSteps ? "Finalizar" : "Siguiente";
+    }
+    
+    document.querySelector('.steps-container').scrollTop = 0;
+}
     </script>
 </body>
 </html>
