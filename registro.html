@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>Smart Pet | Registro SIAMFUH</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --brand: #0f0a09; 
+            --accent: #e89c2c; 
+            --accent-glow: rgba(232, 156, 44, 0.3);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body { 
+            background: var(--brand); 
+            color: #f0f0f0; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Fondo dinámico igual al matchmaking */
+        #bg-image {
+            position: fixed; inset: 0; width: 100%; height: 100%;
+            background-image: url('fondo de login.jpeg');
+            background-size: cover; background-position: center;
+            filter: brightness(0.15); z-index: -1;
+        }
+
+        .glass-morfism {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); 
+            border-radius: 32px;
+        }
+
+        .input-field {
+            width: 100%; background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 14px 20px; color: white;
+            transition: all 0.4s ease; font-size: 14px;
+        }
+
+        .input-field:focus { 
+            border-color: var(--accent); 
+            box-shadow: 0 0 15px var(--accent-glow);
+            outline: none; 
+        }
+
+        #custom-toast {
+            position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-150%);
+            z-index: 10000; width: 90%; max-width: 380px;
+            background: rgba(20, 15, 15, 0.9); border: 1px solid var(--accent);
+            border-radius: 24px; padding: 18px; transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #custom-toast.show { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+    <div id="bg-image"></div>
+
+    <div id="custom-toast" class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-full bg-orange-400/20 flex items-center justify-center text-orange-400"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+        <p id="toast-message" class="text-[11px] font-black uppercase tracking-tight"></p>
+    </div>
+
+    <!-- Pantalla de Carga Protocolaria -->
+    <main id="loading-screen" class="h-screen w-full flex flex-col items-center justify-center p-8 text-center bg-[#0f0a09] z-[9999] relative">
+        <div class="w-20 h-20 border-4 border-white/5 border-t-orange-400 rounded-full animate-spin mb-8"></div>
+        <h1 class="text-2xl font-black italic uppercase mb-2">SIAMFUH <span class="text-orange-400">DATABASE</span></h1>
+        <p class="text-[10px] opacity-50 uppercase tracking-[0.4em]">Sincronizando Módulo de Carga</p>
+    </main>
+
+    <!-- Contenido Principal -->
+    <main id="main-content" class="hidden p-6 max-w-2xl mx-auto min-h-screen">
+        <header class="flex items-center justify-between mt-4 mb-8">
+            <div>
+                <h1 class="text-2xl font-black uppercase italic">Alta de Especies</h1>
+                <p class="text-[10px] text-orange-400 tracking-[0.3em] font-bold uppercase">Base de Datos Centralizada</p>
+            </div>
+            <button onclick="location.href='match.html'" class="w-12 h-12 glass-morfism flex items-center justify-center hover:text-orange-400 transition-colors">
+                <i class="fa-solid fa-server"></i>
+            </button>
+        </header>
+
+        <form id="pet-form" class="glass-morfism p-8 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold uppercase opacity-40 ml-2">Identificador / Nombre</label>
+                    <input type="text" id="nombre" class="input-field" placeholder="Nombre de la mascota" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold uppercase opacity-40 ml-2">Protocolo de Especie</label>
+                    <select id="especie" class="input-field" required>
+                        <option value="Canino">Caninos</option>
+                        <option value="Felino">Felinos</option>
+                        <option value="Ave">Aves</option>
+                        <option value="Reptil">Reptiles</option>
+                        <option value="Acuático">Acuáticos</option>
+                        <option value="Rescate">Urgentes / Rescate</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold uppercase opacity-40 ml-2">Directorio de Imagen (URL)</label>
+                <input type="url" id="foto" class="input-field" placeholder="https://cloud-storage.com/pet.jpg" required>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold uppercase opacity-40 ml-2">Ciclo de Vida (Edad)</label>
+                    <input type="text" id="edad" class="input-field" placeholder="Ej: 3 meses" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold uppercase opacity-40 ml-2">Estado Biológico</label>
+                    <input type="text" id="salud" class="input-field" placeholder="Ej: Saludable / Vacunado" required>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold uppercase opacity-40 ml-2">Análisis de Temperamento</label>
+                <textarea id="personalidad" class="input-field h-28" placeholder="Describe el perfil psicológico del animal..." required></textarea>
+            </div>
+
+            <button type="submit" id="btn-submit" class="w-full py-5 bg-orange-400 text-black rounded-2xl font-black text-[11px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_20px_rgba(232,156,44,0.3)]">
+                Inyectar en Base de Datos
+            </button>
+        </form>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Configuración idéntica para asegurar conexión con el Matchmaker
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBiiY9GSlF-7r3wjBwcLCq5jyxKVOjAAE",
+            authDomain: "smartform-ee4bb.firebaseapp.com",
+            projectId: "smartform-ee4bb",
+            storageBucket: "smartform-ee4bb.firebasestorage.app",
+            messagingSenderId: "590912576678",
+            appId: "1:590912576678:web:5dd2406d46b31ada5b6867"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Control de Interfaz
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+            }, 2000);
+        });
+
+        function showMsg(text) {
+            const toast = document.getElementById('custom-toast');
+            document.getElementById('toast-message').innerText = text;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Lógica de Registro
+        document.getElementById('pet-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = true;
+            btn.innerText = "ENCRIPTANDO Y SUBIENDO...";
+
+            // Los valores de "especie" coinciden con los labels que guarda el localStorage del Matchmaker
+            const petData = {
+                nombre: document.getElementById('nombre').value,
+                especie: document.getElementById('especie').value,
+                foto: document.getElementById('foto').value,
+                edad: document.getElementById('edad').value,
+                salud: document.getElementById('salud').value,
+                personalidad: document.getElementById('personalidad').value,
+                createdAt: new Date()
+            };
+
+            try {
+                await addDoc(collection(db, "mascotas"), petData);
+                showMsg("Protocolo de registro completado");
+                document.getElementById('pet-form').reset();
+            } catch (error) {
+                showMsg("Fallo en la conexión SIAMFUH");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "INYECTAR EN BASE DE DATOS";
+            }
+        });
+    </script>
+</body>
+</html>
