@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>SmartFuh | Vet Maps Elite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --brand: #1a0f0e; --accent: #e89c2c; }
+        body { 
+            margin: 0; background: var(--brand); color: white; 
+            font-family: 'Inter', sans-serif; overflow-x: hidden;
+        }
+        
+        #bg-image {
+            position: fixed; inset: 0; width: 100%; height: 100%;
+            background-image: url('fondo de login.jpeg'); 
+            background-size: cover; background-position: center;
+            filter: brightness(0.25); z-index: -1;
+        }
+
+        .glass { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 28px;
+        }
+
+        /* Contenedor del Mapa con profundidad */
+        .map-wrapper {
+            position: relative;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 35px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .map-container {
+            position: relative;
+            width: 100%;
+            padding-top: 110%; /* Más alto para móvil */
+            border-radius: 25px;
+            overflow: hidden;
+        }
+
+        /* Quitamos los filtros de inversión para que el mapa se vea normal */
+        .map-container iframe {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border: 0;
+            /* El mapa ahora se verá con sus colores originales */
+        }
+
+        .search-bar {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+        .search-bar:focus-within {
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.1);
+        }
+
+        @media (min-width: 768px) {
+            .map-container { padding-top: 50%; }
+        }
+
+        .btn-call {
+            background: linear-gradient(135deg, #e89c2c 0%, #bb7a1a 100%);
+            box-shadow: 0 4px 15px rgba(232, 156, 44, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg-image"></div>
+
+    <header class="p-6 pt-12 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <a href="inicio.html" class="w-11 h-11 glass flex items-center justify-center text-white active:scale-90 transition-transform">
+                <i class="fa-solid fa-arrow-left-long"></i>
+            </a>
+            <div>
+                <h1 class="text-xl font-black italic uppercase tracking-tighter">Vet Locator</h1>
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                    <p class="text-[8px] font-bold opacity-60 uppercase tracking-widest">Cd. Obregón Activo</p>
+                </div>
+            </div>
+        </div>
+        <div class="w-11 h-11 glass flex items-center justify-center text-orange-400">
+            <i class="fa-solid fa-location-crosshairs"></i>
+        </div>
+    </header>
+
+    <main class="px-6 space-y-6 pb-12">
+
+        <div class="search-bar flex items-center px-5 py-4 gap-3">
+            <i class="fa-solid fa-magnifying-glass text-orange-400/50 text-sm"></i>
+            <input type="text" placeholder="BUSCAR VETERINARIA CERCANA..." class="bg-transparent border-none outline-none text-[10px] font-bold uppercase tracking-widest w-full placeholder:text-white/20">
+        </div>
+        
+        <section class="map-wrapper">
+            <div class="map-container">
+              <iframe src="https://www.google.com/maps/d/u/0/embed?mid=1tFFeGSY7ReLZg6MHgjTg917YIrO9e8U&ehbc=2E312F" width="640" height="480"></iframe>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Efecto visual al hacer clic
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.glass, button, a') && 'vibrate' in navigator) {
+                navigator.vibrate(10);
+            }
+        });
+    </script>
+</body>
+</html>
