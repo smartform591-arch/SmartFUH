@@ -210,12 +210,9 @@
     <div class="fade-in pb-12" style="animation-delay: 0.4s;">
         <div class="flex justify-between items-end mb-6 px-2">
             <div>
-                <h3 class="text-[11px] font-black opacity-40 uppercase tracking-[0.3em] mb-1">Encuestas creadas</h3>
+                <h3 class="text-[11px] font-black opacity-40 uppercase tracking-[0.3em] mb-1">Mascotas adoptadas</h3>
                 <div class="h-1 w-8 bg-orange-400 rounded-full"></div>
             </div>
-            <button class="text-[10px] font-black uppercase text-orange-400 hover:opacity-70 transition-opacity">
-                Ver todos <i class="fa-solid fa-arrow-right-long ml-1"></i>
-            </button>
         </div>
         
         <div id="listaEncuestas" class="space-y-4">
@@ -318,27 +315,32 @@
 
     nav.innerHTML = `
         <a href="inicio.html" class="nav-item ${currentPage === 'inicio.html' ? 'active' : ''}">
-            <i class="fa-solid fa-house-user"></i>
-            <span>Inicio</span>
-        </a>
+        <i class="fa-solid fa-house-user"></i>
+        <span>Inicio</span>
+    </a>
 
-        <a href="${isAdmin ? 'reportes.html' : 'responder.html'}" class="nav-item ${currentPage === 'reportes.html' || currentPage === 'responder.html' ? 'active' : ''}">
-            <i class="fa-solid ${isAdmin ? 'fa-chart-pie' : 'fa-list-check'}"></i>
-            <span>${isAdmin ? 'Data' : 'Red social'}</span>
-        </a>
+    <a href="mapa.html" class="nav-item ${currentPage === 'mapa.html' ? 'active' : ''}">
+        <i class="fa-solid fa-map-location-dot"></i>
+        <span>Mapa</span>
+    </a>
 
-        <a href="${isAdmin ? 'creador.html' : 'buscar.html'}" class="nav-center-wrapper">
-            <div class="nav-center">
-                <i class="fa-solid ${isAdmin ? 'fa-plus-astronomical' : 'fa-paw'}"></i>
-            </div>
-        </a>
+    <a href="${isAdmin ? 'resgistro de mascotas.html' : 'buscar.html'}" class="nav-center-wrapper">
+        <div class="nav-center">
+            <i class="fa-solid ${isAdmin ? 'fa-plus' : 'fa-paw'}"></i>
+        </div>
+    </a>
 
-        <a href="perfil.html" class="nav-item ${currentPage === 'perfil.html' ? 'active' : ''}">
-            <i class="fa-solid fa-user-shield"></i>
-            <span>Perfil</span>
-        </a>
+    <a href="${isAdmin ? 'reportes.html' : 'responder.html'}" class="nav-item ${currentPage === 'reportes.html' || currentPage === 'responder.html' ? 'active' : ''}">
+        <i class="fa-solid ${isAdmin ? 'fa-chart-pie' : 'fa-list-check'}"></i>
+        <span>${isAdmin ? 'Data' : 'Social'}</span>
+    </a>
 
-        <a href="ajustes.html" class="nav-item ${currentPage === 'ajustes.html' ? 'active' : ''}">
+    <a href="perfil.html" class="nav-item ${currentPage === 'perfil.html' || currentPage === 'ajustes.html' ? 'active' : ''}">
+        <i class="fa-solid fa-user-shield"></i>
+        <span>Perfil</span>
+    </a>
+
+     <a href="ajustes.html" class="nav-item ${currentPage === 'ajustes.html' ? 'active' : ''}">
             <i class="fa-solid fa-microchip"></i>
             <span>Sistema</span>
         </a>
